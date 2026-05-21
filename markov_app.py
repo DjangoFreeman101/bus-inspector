@@ -109,268 +109,399 @@ with st.sidebar:
     default_corpus = (
         '''
         hello bilbo baggins
-2 THE LORD OF THE RINGS 
+        Chapter 1 
+A LONG-EXPECTED PARTY 
 
 
-They seldom now reach three feet; but they have dwindled, they say, 
-and in ancient days they were taller. According to the Red Book, 
-Bandobras Took (Bullroarer), son of Isumbras the Third, was four 
-foot five and able to ride a horse. He was surpassed in all Hobbit 
-records only by two famous characters of old; but that curious matter 
-is dealt with in this book. 
+When Mr. Bilbo Baggins of Bag End announced that he would shortly 
+be celebrating his eleventy-first birthday with a party of special mag- 
+nificence, there was much talk and excitement in Hobbiton. 
 
-As for the Hobbits of the Shire, with whom these tales are con- 
-cerned, in the days of their peace and prosperity they were a merry 
-folk. They dressed in bright colours, being notably fond of yellow 
-and green; but they seldom wore shoes, since their feet had tough 
-leathery soles and were clad in a thick curling hair, much like the 
-hair of their heads, which was commonly brown. Thus, the only craft 
-little practised among them was shoe-making; but they had long and 
-skilful fingers and could make many other useful and comely things. 
-Their faces were as a rule good-natured rather than beautiful, broad, 
-bright-eyed, red-cheeked, with mouths apt to laughter, and to eating 
-and drinking. And laugh they did, and eat, and drink, often and 
-heartily, being fond of simple jests at all times, and of six meals a 
-day (when they could get them). They were hospitable and delighted 
-in parties, and in presents, which they gave away freely and eagerly 
-accepted. 
+Bilbo was very rich and very peculiar, and had been the wonder 
+of the Shire for sixty years, ever since his remarkable disappearance 
+and unexpected return. The riches he had brought back from his 
+travels had now become a local legend, and it was popularly believed, 
+whatever the old folk might say, that the Hill at Bag End was full of 
+tunnels stuffed with treasure. And if that was not enough for fame, 
+there was also his prolonged vigour to marvel at. Time wore on, but it 
+seemed to have little effect on Mr. Baggins. At ninety he was much the 
+same as at fifty. At ninety-nine they began to call him well-preserved; but 
+unchanged would have been nearer the mark. There were some that 
+shook their heads and thought this was too much of a good thing; it 
+seemed unfair that anyone should possess (apparently) perpetual 
+youth as well as (reputedly) inexhaustible wealth. 
 
-It is plain indeed that in spite of later estrangement Hobbits are 
-relatives of ours: far nearer to us than Elves, or even than Dwarves. 
-Of old they spoke the languages of Men, after their own fashion, and 
-liked and disliked much the same things as Men did. But what exactly 
-our relationship is can no longer be discovered. The beginning of 
-Hobbits lies far back in the Elder Days that are now lost and forgotten. 
-Only the Elves still preserve any records of that vanished time, and 
-their traditions are concerned almost entirely with their own history, 
-in which Men appear seldom and Hobbits are not mentioned at all. 
-Yet it is clear that Hobbits had, in fact, lived quietly in Middle-earth 
-for many long years before other folk became even aware of them. 
-And the world being after all full of strange creatures beyond count, 
-these little people seemed of very little importance. But in the days 
-of Bilbo, and of Frodo his heir, they suddenly became, by no wish 
-of their own, both important and renowned, and troubled the 
-counsels of the Wise and the Great. 
+‘It will have to be paid for,’ they said. ‘It isn’t natural, and trouble 
+will come of it!’ 
 
 
-Those days, the Third Age of Middle-earth, are now long past, 
-and the shape of all lands has been changed; but the regions in which 
-Hobbits then lived were doubtless the same as those in which they 
-still linger: the North-West of the Old World, east of the Sea. Of their 
-original home the Hobbits in Bilbo’s time preserved no knowledge. A 
-love of learning (other than genealogical lore) was far from general 
+But so far trouble had not come; and as Mr. Baggins was generous 
+with his money, most people were willing to forgive him his oddities 
+and his good fortune. He remained on visiting terms with his relatives 
+(except, of course, the Sackville-Bagginses), and he had many de- 
+voted admirers among the hobbits of poor and unimportant families. 
+But he had no close friends, until some of his younger cousins began 
+to grow up. 
+
+The eldest of these, and Bilbo’s favourite, was young Frodo 
+Baggins. When Bilbo was ninety-nine he adopted Frodo as his heir, 
+and brought him to live at Bag End; and the hopes of the Sackville- 
+Bagginses were finally dashed. Bilbo and Frodo happened to have 
+the same birthday, September 22nd. ‘You had better come and live 
+here, Frodo my lad,’ said Bilbo one day; ‘and then we can celebrate 
+our birthday-parties comfortably together.’ At that time Frodo was 
+still in his tweens, as the hobbits called the irresponsible twenties 
+between childhood and coming of age at thirty-three. 
 
 
-PROLOGUE 3 
+Twelve more years passed. Each year the Bagginses had given 
+very lively combined birthday-parties at Bag End; but now it was 
 
 
-among them, but there remained still a few in the older families who 
-studied their own books, and even gathered reports of old times and 
-distant lands from Elves, Dwarves, and Men. Their own records 
-began only after the settlement of the Shire, and their most ancient 
-legends hardly looked further back than their Wandering Days. It is 
-clear, nonetheless, from these legends, and from the evidence of their 
-peculiar words and customs, that like many other folk Hobbits had 
-in the distant past moved westward. Their earliest tales seem to 
-glimpse a time when they dwelt in the upper vales of Anduin, between 
-the eaves of Greenwood the Great and the Misty Mountains. Why 
-they later undertook the hard and perilous crossing of the mountains 
-into Eriador is no longer certain. Their own accounts speak of the 
-multiplying of Men in the land, and of a shadow that fell on the 
-forest, so that it became darkened and its new name was Mirkwood. 
-
-Before the crossing of the mountains the Hobbits had already 
-become divided into three somewhat different breeds: Harfoots, 
-Stoors, and Fallohides. The Harfoots were browner of skin, smaller, 
-and shorter, and they were beardless and bootless; their hands and 
-feet were neat and nimble; and they preferred highlands and hillsides. 
-The Stoors were broader, heavier in build; their feet and hands were 
-larger; and they preferred flat lands and riversides. The Fallohides 
-were fairer of skin and also of hair, and they were taller and slimmer 
-than the others; they were lovers of trees and of woodlands. 
-
-The Harfoots had much to do with Dwarves in ancient times, and 
-long lived in the foothills of the mountains. They moved westward 
-early, and roamed over Eriador as far as Weathertop while the others 
-were still in Wilderland. They were the most normal and repre- 
-sentative variety of Hobbit, and far the most numerous. They were 
-the most inclined to settle in one place, and longest preserved their 
-ancestral habit of living in tunnels and holes. 
-
-The Stoors lingered long by the banks of the Great River Anduin, 
-and were less shy of Men. They came west after the Harfoots and 
-followed the course of the Loudwater southwards; and there many 
-of them long dwelt between Tharbad and the borders of Dunland 
-before they moved north again. 
-
-The Fallohides, the least numerous, were a northerly branch. They 
-were more friendly with Elves than the other Hobbits were, and had 
-more skill in language and song than in handicrafts; and of old they 
-preferred hunting to tilling. They crossed the mountains north of 
-Rivendell and came down the River Hoarwell. In Eriador they soon 
-mingled with the other kinds that had preceded them, but being 
-somewhat bolder and more adventurous, they were often found as 
-leaders or chieftains among clans of Harfoots or Stoors. Even in 
-Bilbo’s time the strong Fallohidish strain could still be noted among 
+22 THE LORD OF THE RINGS 
 
 
-4 THE LORD OF THE RINGS 
+understood that something quite exceptional was being planned for 
+that autumn. Bilbo was going to be eleventy-one, 111, a rather curious 
+number, and a very respectable age for a hobbit (the Old Took himself 
+had only reached 130); and Frodo was going to be thirty-three, 33, an 
+important number: the date of his ‘coming of age’. 
+
+Tongues began to wag in Hobbiton and Bywater; and rumour of 
+the coming event travelled all over the Shire. The history and charac- 
+ter of Mr. Bilbo Baggins became once again the chief topic of conver- 
+sation; and the older folk suddenly found their reminiscences in 
+welcome demand. 
+
+No one had a more attentive audience than old Ham Gamgee, 
+commonly known as the Gaffer. He held forth at The Ivy Bush, a 
+small inn on the Bywater road; and he spoke with some authority, 
+for he had tended the garden at Bag End for forty years, and had 
+helped old Holman in the same job before that. Now that he was 
+himself growing old and stiff in the joints, the job was mainly carried 
+on by his youngest son, Sam Gamgee. Both father and son were on 
+very friendly terms with Bilbo and Frodo. They lived on the Hill 
+itself, in Number 3 Bagshot Row just below Bag End. 
+
+‘A very nice well-spoken gentlehobbit is Mr. Bilbo, as I’ve always 
+said,’ the Gaffer declared. With perfect truth: for Bilbo was very 
+polite to him, calling him ‘Master Hamfast’, and consulting him 
+constantly upon the growing of vegetables — in the matter of ‘roots’, 
+especially potatoes, the Gaffer was recognized as the leading authority 
+by all in the neighbourhood (including himself). 
+
+‘But what about this Frodo that lives with him?’ asked Old Noakes 
+of Bywater. ‘Baggins is his name, but he’s more than half a Brandy- 
+buck, they say. It beats me why any Baggins of Hobbiton should go 
+looking for a wife away there in Buckland, where folks are so queer.’ 
+
+‘And no wonder they’re queer,’ put in Daddy Twofoot (the 
+Gaffer’s next-door neighbour), ‘if they live on the wrong side of the 
+Brandywine River, and right agin the Old Forest. That’s a dark bad 
+place, if half the tales be true.’ 
+
+‘You’re right, Dad!’ said the Gaffer. ‘Not that the Brandybucks 
+of Buckland live in the Old Forest; but they’re a queer breed, seem- 
+ingly. They fool about with boats on that big river — and that isn’t 
+natural. Small wonder that trouble came of it, I say. But be that as 
+it may, Mr. Frodo is as nice a young hobbit as you could wish to 
+meet. Very much like Mr. Bilbo, and in more than looks. After all 
+his father was a Baggins. A decent respectable hobbit was Mr. Drogo 
+Baggins; there was never much to tell of him, till he was drownded.’ 
+
+‘Drownded?’ said several voices. They had heard this and other 
+darker rumours before, of course; but hobbits have a passion for 
+family history, and they were ready to hear it again. 
 
 
-the greater families, such as the Tooks and the Masters of Buckland. 
-
-In the westlands of Eriador, between the Misty Mountains and 
-the Mountains of Lune, the Hobbits found both Men and Elves. 
-Indeed, a remnant still dwelt there of the Dunedain, the kings of 
-Men that came over the Sea out of Westernesse; but they were dwin- 
-dling fast and the lands of their North Kingdom were falling far and 
-wide into waste. There was room and to spare for incomers, and ere 
-long the Hobbits began to settle in ordered communities. Most of 
-their earlier settlements had long disappeared and been forgotten in 
-Bilbo’s time; but one of the first to become important still endured, 
-though reduced in size; this was at Bree and in the Chetwood that 
-lay round about, some forty miles east of the Shire. 
-
-It was in these early days, doubtless, that the Hobbits learned their 
-letters and began to write after the manner of the Duinedain, who 
-had in their turn long before learned the art from the Elves. And in 
-those days also they forgot whatever languages they had used before, 
-and spoke ever after the Common Speech, the Westron as it was 
-named, that was current through all the lands of the kings from Arnor 
-to Gondor, and about all the coasts of the Sea from Belfalas to Lune. 
-Yet they kept a few words of their own, as well as their own names 
-of months and days, and a great store of personal names out of 
-the past. 
-
-About this time legend among the Hobbits first becomes history 
-with a reckoning of years. For it was in the one thousand six hundred 
-and first year of the Third Age that the Fallohide brothers, Marcho 
-and Blanco, set out from Bree; and having obtained permission from 
-the high king at Fornost,* they crossed the brown river Baranduin 
-with a great following of Hobbits. They passed over the Bridge of 
-Stonebows, that had been built in the days of the power of the North 
-Kingdom, and they took all the land beyond to dwell in, between 
-the river and the Far Downs. All that was demanded of them was 
-that they should keep the Great Bridge in repair, and all other bridges 
-and roads, speed the king’s messengers, and acknowledge his 
-lordship. 
-
-Thus began the Shire-reckoning, for the year of the crossing of the 
-Brandywine (as the Hobbits turned the name) became Year One of 
-the Shire, and all later dates were reckoned from it.t At once the 
-western Hobbits fell in love with their new land, and they remained 
-there, and soon passed once more out of the history of Men and of 
-Elves. While there was still a king they were in name his subjects, 
+A LONG-EXPECTED PARTY 23 
 
 
-* As the records of Gondor relate this was Argeleb II, the twentieth of the Northern 
-line, which came to an end with Arvedui three hundred years later. 
+‘Well, so they say,’ said the Gaffer. “You see: Mr. Drogo, he 
+married poor Miss Primula Brandybuck. She was our Mr. Bilbo’s 
+first cousin on the mother’s side (her mother being the youngest of 
+the Old Took’s daughters); and Mr. Drogo was his second cousin. 
+So Mr. Frodo is his first and second cousin, once removed either 
+way, as the saying is, if you follow me. And Mr. Drogo was staying 
+at Brandy Hall with his father-in-law, old Master Gorbadoc, as he 
+often did after his marriage (him being partial to his vittles, and old 
+Gorbadoc keeping a mighty generous table); and he went out boating 
+on the Brandywine River; and he and his wife were drownded, and 
+poor Mr. Frodo only a child and all.’ 
 
-+ Thus, the years of the Third Age in the reckoning of the Elves and the Dunedain 
-may be found by adding 1600 to the dates of Shire-reckoning. 
+‘I’ve heard they went on the water after dinner in the moonlight,’ 
+said Old Noakes; ‘and it was Drogo’s weight as sunk the boat.’ 
 
+‘And I heard she pushed him in, and he pulled her in after him,’ 
+said Sandyman, the Hobbiton miller. 
 
-PROLOGUE 5 
+“You shouldn’t listen to all you hear, Sandyman,’ said the Gaffer, 
+who did not much like the miller. “There isn’t no call to go talking 
+of pushing and pulling. Boats are quite tricky enough for those that 
+sit still without looking further for the cause of trouble. Anyway: 
+there was this Mr. Frodo left an orphan and stranded, as you might 
+say, among those queer Bucklanders, being brought up anyhow in 
+Brandy Hall. A regular warren, by all accounts. Old Master Gorbadoc 
+never had fewer than a couple of hundred relations in the place. Mr. 
+Bilbo never did a kinder deed than when he brought the lad back to 
+live among decent folk. 
 
+‘But I reckon it was a nasty knock for those Sackville-Bagginses. 
+They thought they were going to get Bag End, that time when he 
+went off and was thought to be dead. And then he comes back and 
+orders them off; and he goes on living and living, and never looking 
+a day older, bless him! And suddenly he produces an heir, and has 
+all the papers made out proper. The Sackville-Bagginses won’t never 
+see the inside of Bag End now, or it is to be hoped not.’ 
 
-but they were, in fact, ruled by their own chieftains and meddled not 
-at all with events in the world outside. To the last battle at Fornost 
-with the Witch-lord of Angmar they sent some bowmen to the aid 
-of the king, or so they maintained, though no tales of Men record 
-it. But in that war the North Kingdom ended; and then the Hobbits 
-took the land for their own, and they chose from their own chiefs a 
-Thain to hold the authority of the king that was gone. There for a 
-thousand years they were little troubled by wars, and they prospered 
-and multiplied after the Dark Plague (S.R. 37) until the disaster of 
-the Long Winter and the famine that followed it. Many thousands 
-then perished, but the Days of Dearth (1158-60) were at the time of 
-this tale long past and the Hobbits had again become accustomed 
-to plenty. The land was rich and kindly, and though it had long been 
-deserted when they entered it, it had before been well tilled, and 
-there the king had once had many farms, cornlands, vineyards, and 
-woods. 
+“There’s a tidy bit of money tucked away up there, I hear tell,’ 
+said a stranger, a visitor on business from Michel Delving in the 
+Westfarthing. ‘All the top of your hill is full of tunnels packed with 
+chests of gold and silver, and jools, by what I’ve heard.’ 
 
-Forty leagues it stretched from the Far Downs to the Brandywine 
-Bridge, and fifty from the northern moors to the marshes in the south. 
-The Hobbits named it the Shire, as the region of the authority of 
-their Thain, and a district of well-ordered business; and there in that 
-pleasant corner of the world they plied their well-ordered business 
-of living, and they heeded less and less the world outside where dark 
-things moved, until they came to think that peace and plenty were 
-the rule in Middle-earth and the right of all sensible folk. They forgot 
-or ignored what little they had ever known of the Guardians, and of 
-the labours of those that made possible the long peace of the Shire. 
-They were, in fact, sheltered, but they had ceased to remember it. 
-
-At no time had Hobbits of any kind been warlike, and they had 
-never fought among themselves. In olden days they had, of course, 
-been often obliged to fight to maintain themselves in a hard world; 
-but in Bilbo’s time that was very ancient history. The last battle, 
-before this story opens, and indeed the only one that had ever been 
-fought within the borders of the Shire, was beyond living memory: 
-the Battle of Greenfields, S.R. 1147, in which Bandobras Took routed 
-an invasion of Orcs. Even the weathers had grown milder, and the 
-wolves that had once come ravening out of the North in bitter white 
-winters were now only a grandfather’s tale. So, though there was 
-still some store of weapons in the Shire, these were used mostly as 
-trophies, hanging above hearths or on walls, or gathered into the 
-museum at Michel Delving. The Mathom-house it was called; for 
-anything that Hobbits had no immediate use for, but were unwilling 
-to throw away, they called a mathom. Their dwellings were apt to 
-become rather crowded with mathoms, and many of the presents 
-that passed from hand to hand were of that sort. 
+‘Then you’ve heard more than I can speak to,’ answered the 
+Gaffer. ‘I know nothing about jools. Mr. Bilbo is free with his money, 
+and there seems no lack of it; but I know of no tunnel-making. I saw 
+Mr. Bilbo when he came back, a matter of sixty years ago, when I 
+was a lad. I’d not long come prentice to old Holman (him being my 
+dad’s cousin), but he had me up at Bag End helping him to keep 
+folks from trampling and trapessing all over the garden while the sale 
+was on. And in the middle of it all Mr. Bilbo comes up the Hill with 
 
 
-6 THE LORD OF THE RINGS 
+24 THE LORD OF THE RINGS 
 
 
-Nonetheless, ease and peace had left this people still curiously 
-tough. They were, if it came to it, difficult to daunt or to kill; and 
-they were, perhaps, so unwearyingly fond of good things not least 
-because they could, when put to it, do without them, and could 
-survive rough handling by grief, foe, or weather in a way that aston- 
-ished those who did not know them well and looked no further than 
-their bellies and their well-fed faces. Though slow to quarrel, and for 
-sport killing nothing that lived, they were doughty at bay, and at 
-need could still handle arms. They shot well with the bow, for they 
-were keen-eyed and sure at the mark. Not only with bows and arrows. 
-If any Hobbit stooped for a stone, it was well to get quickly under 
-cover, as all trespassing beasts knew very well. 
+a pony and some mighty big bags and a couple of chests. I don’t 
+doubt they were mostly full of treasure he had picked up in foreign 
+parts, where there be mountains of gold, they say; but there wasn’t 
+enough to fill tunnels. But my lad Sam will know more about that. 
+He’s in and out of Bag End. Crazy about stories of the old days, he 
+is, and he listens to all Mr. Bilbo’s tales. Mr. Bilbo has learned him 
+his letters — meaning no harm, mark you, and I hope no harm will 
+come of it. 
 
-All Hobbits had originally lived in holes in the ground, or so they 
-believed, and in such dwellings they still felt most at home; but in 
-the course of time they had been obliged to adopt other forms of 
-abode. Actually in the Shire in Bilbo’s days it was, as a rule, only 
-the richest and the poorest Hobbits that maintained the old custom. 
-The poorest went on living in burrows of the most primitive kind, 
-mere holes indeed, with only one window or none; while the well- 
-to-do still constructed more luxurious versions of the simple diggings 
-of old. But suitable sites for these large and ramifying tunnels (or 
-smials as they called them) were not everywhere to be found; and in 
-the flats and the low-lying districts the Hobbits, as they multiplied, 
-began to build above ground. Indeed, even in the hilly regions and 
-the older villages, such as Hobbiton or Tuckborough, or in the chief 
-township of the Shire, Michel Delving on the White Downs, there 
-were now many houses of wood, brick, or stone. These were specially 
-favoured by millers, smiths, ropers, and cartwrights, and others of 
-that sort; for even when they had holes to live in, Hobbits had long 
-been accustomed to build sheds and workshops. 
+‘Elves and Dragons! I says to him. Cabbages and potatoes are better 
+for me and you. Don’t go getting mixed up in the business of your betters, 
+or you'll land in trouble too big for you, I says to him. And I might say 
+it to others,’ he added with a look at the stranger and the miller. 
 
-The habit of building farmhouses and barns was said to have begun 
-among the inhabitants of the Marish down by the Brandywine. The 
-Hobbits of that quarter, the Eastfarthing, were rather large and heavy- 
-legged, and they wore dwarf-boots in muddy weather. But they were 
-well known to be Stoors in a large part of their blood, as indeed was 
-shown by the down that many grew on their chins. No Harfoot or 
-Fallohide had any trace of a beard. Indeed, the folk of the Marish, 
-and of Buckland, east of the River, which they afterwards occupied, 
-came for the most part later into the Shire up from south-away; and 
-they still had many peculiar names and strange words not found 
-elsewhere in the Shire. 
+But the Gaffer did not convince his audience. The legend of 
+Bilbo’s wealth was now too firmly fixed in the minds of the younger 
+generation of hobbits. 
 
-It is probable that the craft of building, as many other crafts beside, 
-was derived from the Dunedain. But the Hobbits may have learned 
-it direct from the Elves, the teachers of Men in their youth.
+‘Ah, but he has likely enough been adding to what he brought at 
+first,’ argued the miller, voicing common opinion. ‘He’s often away 
+from home. And look at the outlandish folk that visit him: dwarves 
+coming at night, and that old wandering conjuror, Gandalf, and all. 
+You can say what you like, Gaffer, but Bag End’s a queer place, and 
+its folk are queerer.’ 
+
+‘And you can say what you like, about what you know no more 
+of than you do of boating, Mr. Sandyman,’ retorted the Gaffer, dislik- 
+ing the miller even more than usual. ‘If that’s being queer, then we 
+could do with a bit more queerness in these parts. There’s some not 
+far away that wouldn’t offer a pint of beer to a friend, if they lived 
+in a hole with golden walls. But they do things proper at Bag End. 
+Our Sam says that everyone’s going to be invited to the party, and 
+there’s going to be presents, mark you, presents for all — this very 
+month as is.’ 
+
+
+That very month was September, and as fine as you could ask. A 
+day or two later a rumour (probably started by the knowledgeable 
+Sam) was spread about that there were going to be fireworks — fire- 
+works, what is more, such as had not been seen in the Shire for nigh 
+on a century, not indeed since the Old Took died. 
+
+Days passed and The Day drew nearer. An odd-looking waggon 
+laden with odd-looking packages rolled into Hobbiton one evening 
+and toiled up the Hill to Bag End. The startled hobbits peered out 
+of lamplit doors to gape at it. It was driven by outlandish folk, singing 
+strange songs: dwarves with long beards and deep hoods. A few of 
+them remained at Bag End. At the end of the second week in Sep- 
+tember a cart came in through Bywater from the direction of Brandy- 
+wine Bridge in broad daylight. An old man was driving it all alone. 
+
+
+A LONG-EXPECTED PARTY 25 
+
+
+He wore a tall pointed blue hat, a long grey cloak, and a silver scarf. 
+He had a long white beard and bushy eyebrows that stuck out beyond 
+the brim of his hat. Small hobbit-children ran after the cart all through 
+Hobbiton and right up the hill. It had a cargo of fireworks, as they 
+rightly guessed. At Bilbo’s front door the old man began to unload: 
+there were great bundles of fireworks of all sorts and shapes, each 
+labelled with a large red G & and the elf-rune, P” 
+
+That was Gandalf’s mark, of course, and the old man was Gandalf 
+the Wizard, whose fame in the Shire was due mainly to his skill with 
+fires, smokes, and lights. His real business was far more difficult and 
+dangerous, but the Shire-folk knew nothing about it. To them he 
+was just one of the ‘attractions’ at the Party. Hence the excitement 
+of the hobbit-children. ‘G for Grand!’ they shouted, and the old man 
+smiled. They knew him by sight, though he only appeared in Hobbi- 
+ton occasionally and never stopped long; but neither they nor any 
+but the oldest of their elders had seen one of his firework displays — 
+they now belonged to a legendary past. 
+
+When the old man, helped by Bilbo and some dwarves, had 
+finished unloading, Bilbo gave a few pennies away; but not a single 
+squib or cracker was forthcoming, to the disappointment of the 
+onlookers. 
+
+‘Run away now!’ said Gandalf. ‘You will get plenty when the time 
+comes.’ Then he disappeared inside with Bilbo, and the door was 
+shut. The young hobbits stared at the door in vain for a while, and 
+then made off, feeling that the day of the party would never come. 
+
+
+Inside Bag End, Bilbo and Gandalf were sitting at the open window 
+of a small room looking out west on to the garden. The late afternoon 
+was bright and peaceful. The flowers glowed red and golden: snap- 
+dragons and sunflowers, and nasturtians trailing all over the turf walls 
+and peeping in at the round windows. 
+
+‘How bright your garden looks!’ said Gandalf. 
+
+‘Yes,’ said Bilbo. ‘I am very fond indeed of it, and of all the dear 
+old Shire; but I think I need a holiday.’ 
+
+“You mean to go on with your plan then?’ 
+
+‘I do. I made up my mind months ago, and I haven’t changed it.’ 
+
+‘Very well. It is no good saying any more. Stick to your plan — 
+your whole plan, mind — and I hope it will turn out for the best, for 
+you, and for all of us.’ 
+
+‘I hope so. Anyway I mean to enjoy myself on Thursday, and have 
+my little joke.’ 
+
+‘Who will laugh, I wonder?’ said Gandalf, shaking his head. 
+
+‘We shall see,’ said Bilbo. 
+
+
+* * * 
+
+
+26 THE LORD OF THE RINGS 
+
+
+The next day more carts rolled up the Hill, and still more carts. 
+There might have been some grumbling about ‘dealing locally’, but 
+that very week orders began to pour out of Bag End for every kind 
+of provision, commodity, or luxury that could be obtained in Hobbi- 
+ton or Bywater or anywhere in the neighbourhood. People became 
+enthusiastic; and they began to tick off the days on the calendar; and 
+they watched eagerly for the postman, hoping for invitations. 
+
+Before long the invitations began pouring out, and the Hobbiton 
+post-office was blocked, and the Bywater post-office was snowed 
+under, and voluntary assistant postmen were called for. There was a 
+constant stream of them going up the Hill, carrying hundreds of 
+polite variations on Thank you, I shall certainly come. 
+
+A notice appeared on the gate at Bag End: NO ADMITTANCE 
+EXCEPT ON PARTY BUSINESS. Even those who had, or pretended to 
+have Party Business were seldom allowed inside. Bilbo was busy: 
+writing invitations, ticking off answers, packing up presents, and 
+making some private preparations of his own. From the time of 
+Gandalf’s arrival he remained hidden from view. 
+
+One morning the hobbits woke to find the large field, south of 
+Bilbo’s front door, covered with ropes and poles for tents and pav- 
+ilions. A special entrance was cut into the bank leading to the road, 
+and wide steps and a large white gate were built there. The three 
+hobbit-families of Bagshot Row, adjoining the field, were intensely 
+interested and generally envied. Old Gaffer Gamgee stopped even 
+pretending to work in his garden. 
+
+The tents began to go up. There was a specially large pavilion, so 
+big that the tree that grew in the field was right inside it, and stood 
+proudly near one end, at the head of the chief table. Lanterns were 
+hung on all its branches. More promising still (to the hobbits’ mind): 
+an enormous open-air kitchen was erected in the north corner of the 
+field. A draught of cooks, from every inn and eating-house for miles 
+around, arrived to supplement the dwarves and other odd folk that 
+were quartered at Bag End. Excitement rose to its height. 
+
+Then the weather clouded over. That was on Wednesday the eve 
+of the Party. Anxiety was intense. Then Thursday, September the 
+22nd, actually dawned. The sun got up, the clouds vanished, flags 
+were unfurled and the fun began. 
+
+Bilbo Baggins called it a party, but it was really a variety of enter- 
+tainments rolled into one. Practically everybody living near was 
+invited. A very few were overlooked by accident, but as they turned 
+up all the same, that did not matter. Many people from other parts 
+of the Shire were also asked; and there were even a few from outside 
+the borders. Bilbo met the guests (and additions) at the new white 
+gate in person. He gave away presents to all and sundry — the latter 
+
+
+A LONG-EXPECTED PARTY 27 
+
+
+were those who went out again by a back way and came in again by 
+the gate. Hobbits give presents to other people on their own birthdays. 
+Not very expensive ones, as a rule, and not so lavishly as on this 
+occasion; but it was not a bad system. Actually in Hobbiton and 
+Bywater every day in the year was somebody’s birthday, so that every 
+hobbit in those parts had a fair chance of at least one present at least 
+once a week. But they never got tired of them. 
+
+On this occasion the presents were unusually good. The hobbit- 
+children were so excited that for a while they almost forgot about 
+eating. There were toys the like of which they had never seen before, 
+all beautiful and some obviously magical. Many of them had indeed 
+been ordered a year before, and had come all the way from the 
+Mountain and from Dale, and were of real dwarf-make. 
+
+When every guest had been welcomed and was finally inside the 
+gate, there were songs, dances, music, games, and, of course, food 
+and drink. There were three official meals: lunch, tea, and dinner 
+(or supper). But lunch and tea were marked chiefly by the fact that 
+at those times all the guests were sitting down and eating together. 
+At other times there were merely lots of people eating and drinking 
+—continuously from elevenses until six-thirty, when the fireworks 
+started. 
+
+The fireworks were by Gandalf: they were not only brought by 
+him, but designed and made by him; and the special effects, set 
+pieces, and flights of rockets were let off by him. But there was also 
+a generous distribution of squibs, crackers, backarappers, sparklers, 
+torches, dwarf-candles, elf-fountains, goblin-barkers and thunder- 
+claps. They were all superb. The art of Gandalf improved with age. 
+
+There were rockets like a flight of scintillating birds singing with 
+sweet voices. There were green trees with trunks of dark smoke: their 
+leaves opened like a whole spring unfolding in a moment, and their 
+shining branches dropped glowing flowers down upon the astonished 
+hobbits, disappearing with a sweet scent just before they touched their 
+upturned faces. There were fountains of butterflies that flew glittering 
+into the trees; there were pillars of coloured fires that rose and turned 
+into eagles, or sailing ships, or a phalanx of flying swans; there was 
+a red thunderstorm and a shower of yellow rain; there was a forest 
+of silver spears that sprang suddenly into the air with a yell like an 
+embattled army, and came down again into the Water with a hiss 
+like a hundred hot snakes. And there was also one last surprise, in 
+honour of Bilbo, and it startled the hobbits exceedingly, as Gandalf 
+intended. The lights went out. A great smoke went up. It shaped 
+itself like a mountain seen in the distance, and began to glow at the 
+summit. It spouted green and scarlet flames. Out flew a red-golden 
+dragon — not life-size, but terribly life-like: fire came from his jaws, 
+
+
+28 THE LORD OF THE RINGS 
+
+
+his eyes glared down; there was a roar, and he whizzed three times 
+over the heads of the crowd. They all ducked, and many fell flat on 
+their faces. The dragon passed like an express train, turned a somer- 
+sault, and burst over Bywater with a deafening explosion.
         '''
     )
 

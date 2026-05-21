@@ -108,7 +108,7 @@ with st.sidebar:
 
     default_corpus = (
         '''
-        
+        hello bilbo baggins
 2 THE LORD OF THE RINGS 
 
 

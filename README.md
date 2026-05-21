@@ -3,7 +3,7 @@
 A next-word prediction engine built from scratch in Python, with an interactive Streamlit web interface. No ML libraries, just probability theory and linear algebra.
 
 ## Live Demo
-[Try it here](https://your-app.streamlit.app) ← update this link after deployment
+[Try it here](https://markovnextwordpredictor-gydrnxmhlpx4ajrkefpzwj.streamlit.app/)
 
 ## What it does
 - Trains a Markov chain transition matrix on any text corpus you provide

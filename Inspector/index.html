@@ -116,8 +116,14 @@
 
   function statusText(s) {
     if (s.has_inspector === null) return '⚪ אין דיווח עדיין';
-    if (s.has_inspector) return '🔴 יש בודק';
-    return '🟢 נקי';
+    let prob = '';
+    if (s.total_votes >= 30) {
+      const winningSide = s.has_inspector ? s.yes_votes : s.no_votes;
+      const pct = Math.round((winningSide / s.total_votes) * 100);
+      prob = ` (${pct}%)`;
+    }
+    if (s.has_inspector) return `🔴 יש בודק${prob}`;
+    return `🟢 נקי${prob}`;
   }
 
   function votesText(s) {

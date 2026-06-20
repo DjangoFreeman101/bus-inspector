@@ -65,14 +65,157 @@
     attribution: '© OpenStreetMap contributors'
   }).addTo(map);
 
-  // --- Live user location ---
+  // --- Live user location + proximity detection ---
   let userMarker = null;
+  let userLat = null;
+  let userLon = null;
+
+  // Proximity state
+  const PROXIMITY_METERS = 50;        // how close to trigger (meters)
+  const NEAR_DURATION_MS = 60 * 1000; // how long to be near before popup (1 min)
+  const SNOOZE_MS = 5 * 60 * 1000;   // how long to wait before asking again (5 min)
+  const BOX_DEG = 0.005;              // ~500m bounding box in degrees
+
+  let nearStationId = null;       // which station user is currently near
+  let nearSince = null;           // timestamp when they arrived near it
+  let snoozedStations = {};       // stationId -> timestamp when snoozed
+  let stationsData = [];          // latest stations list from server
+  let promptShown = false;        // is prompt currently visible?
+
+  // Haversine distance in meters between two lat/lon points
+  function haversine(lat1, lon1, lat2, lon2) {
+    const R = 6371000;
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat/2) ** 2 +
+              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+              Math.sin(dLon/2) ** 2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  }
+
+  function checkProximity() {
+    if (userLat === null || stationsData.length === 0 || promptShown) return;
+
+    const now = Date.now();
+
+    // Step 1: bounding box pre-filter (cheap)
+    const candidates = stationsData.filter(s =>
+      Math.abs(s.lat - userLat) < BOX_DEG &&
+      Math.abs(s.lon - userLon) < BOX_DEG
+    );
+
+    // Step 2: precise Haversine on candidates only
+    let closest = null;
+    let closestDist = Infinity;
+    for (const s of candidates) {
+      const dist = haversine(userLat, userLon, s.lat, s.lon);
+      if (dist < closestDist) {
+        closestDist = dist;
+        closest = s;
+      }
+    }
+
+    if (closest && closestDist <= PROXIMITY_METERS) {
+      // Check if snoozed
+      if (snoozedStations[closest.id] && now - snoozedStations[closest.id] < SNOOZE_MS) return;
+
+      if (nearStationId !== closest.id) {
+        // Just arrived near this station
+        nearStationId = closest.id;
+        nearSince = now;
+      } else if (now - nearSince >= NEAR_DURATION_MS) {
+        // Been here for 1 minute — show prompt
+        showProximityPrompt(closest);
+      }
+    } else {
+      // Not near any station
+      nearStationId = null;
+      nearSince = null;
+    }
+  }
+
+  function showProximityPrompt(station) {
+    promptShown = true;
+    snoozedStations[station.id] = Date.now();
+
+    const overlay = document.createElement('div');
+    overlay.style.cssText = `
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.6);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 9999;
+    `;
+
+    overlay.innerHTML = `
+      <div style="
+        background: white; border-radius: 16px;
+        padding: 28px 24px; max-width: 300px; width: 90%;
+        text-align: center; direction: rtl;
+      ">
+        <div style="font-size: 32px; margin-bottom: 12px;">🚌</div>
+        <div style="font-size: 16px; font-weight: bold; color: #1a1a2e; margin-bottom: 8px;">
+          נראה שאתה ב${station.name}
+        </div>
+        <div style="font-size: 14px; color: #666; margin-bottom: 20px;">
+          יש בודק?
+        </div>
+        <div style="display: flex; gap: 10px; justify-content: center;">
+          <button id="prox-yes" style="
+            background: #e74c3c; color: white; border: none;
+            padding: 10px 18px; border-radius: 8px;
+            font-size: 14px; font-weight: bold; cursor: pointer;
+          ">🚨 יש בודק</button>
+          <button id="prox-no" style="
+            background: #27ae60; color: white; border: none;
+            padding: 10px 18px; border-radius: 8px;
+            font-size: 14px; font-weight: bold; cursor: pointer;
+          ">✅ נקי</button>
+        </div>
+        <div style="margin-top: 14px;">
+          <button id="prox-dismiss" style="
+            background: none; border: none; color: #aaa;
+            font-size: 13px; cursor: pointer;
+          ">דלג</button>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    function close() {
+      document.body.removeChild(overlay);
+      promptShown = false;
+    }
+
+    document.getElementById('prox-yes').onclick = async () => {
+      await fetch('/report', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ station_id: station.id, has_inspector: true, user_id: userId })
+      });
+      loadStations();
+      close();
+    };
+
+    document.getElementById('prox-no').onclick = async () => {
+      await fetch('/report', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ station_id: station.id, has_inspector: false, user_id: userId })
+      });
+      loadStations();
+      close();
+    };
+
+    document.getElementById('prox-dismiss').onclick = close;
+  }
 
   function startLocationTracking() {
     if (!navigator.geolocation) return;
     navigator.geolocation.watchPosition(
       (pos) => {
-        const { latitude, longitude } = pos.coords;
+        userLat = pos.coords.latitude;
+        userLon = pos.coords.longitude;
         if (!userMarker) {
           const userIcon = L.divIcon({
             html: `<div style="
@@ -86,16 +229,19 @@
             iconAnchor: [9, 9],
             className: ''
           });
-          userMarker = L.marker([latitude, longitude], { icon: userIcon, zIndexOffset: 1000 })
+          userMarker = L.marker([userLat, userLon], { icon: userIcon, zIndexOffset: 1000 })
             .addTo(map)
             .bindPopup('📍 אתה כאן');
         } else {
-          userMarker.setLatLng([latitude, longitude]);
+          userMarker.setLatLng([userLat, userLon]);
         }
       },
       (err) => console.log('Location error:', err),
       { enableHighAccuracy: true, maximumAge: 5000 }
     );
+
+    // Check proximity every 30 seconds
+    setInterval(checkProximity, 30000);
   }
 
   startLocationTracking();
@@ -148,6 +294,7 @@
   async function loadStations() {
     const res = await fetch('/stations');
     const stations = await res.json();
+    stationsData = stations; // keep latest data for proximity checks
 
     stations.forEach(s => {
       const popupHTML = `

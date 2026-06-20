@@ -134,6 +134,132 @@
     }
   }
 
+  // Get N closest stations to user, excluding a given station id
+  function getClosestStations(excludeId, count) {
+    return stationsData
+      .filter(s => s.id !== excludeId)
+      .map(s => ({
+        ...s,
+        dist: haversine(userLat, userLon, s.lat, s.lon)
+      }))
+      .sort((a, b) => a.dist - b.dist)
+      .slice(0, count);
+  }
+
+  async function submitReport(stationId, hasInspector) {
+    await fetch('/report', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ station_id: stationId, has_inspector: hasInspector, user_id: userId })
+    });
+    loadStations();
+  }
+
+  function showInspectorPrompt(station, overlay) {
+    const card = overlay.querySelector('.prompt-card');
+    card.innerHTML = `
+      <div style="font-size: 32px; margin-bottom: 12px;">🚌</div>
+      <div style="font-size: 16px; font-weight: bold; color: #1a1a2e; margin-bottom: 8px;">
+        נראה שאתה ב${station.name}
+      </div>
+      <div style="font-size: 14px; color: #666; margin-bottom: 20px;">
+        יש בודק?
+      </div>
+      <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+        <button class="prox-yes" style="
+          background: #e74c3c; color: white; border: none;
+          padding: 10px 18px; border-radius: 8px;
+          font-size: 14px; font-weight: bold; cursor: pointer;
+        ">🚨 יש בודק</button>
+        <button class="prox-no" style="
+          background: #27ae60; color: white; border: none;
+          padding: 10px 18px; border-radius: 8px;
+          font-size: 14px; font-weight: bold; cursor: pointer;
+        ">✅ נקי</button>
+      </div>
+      <div style="margin-top: 12px;">
+        <button class="prox-wrong" style="
+          background: none; border: 1px solid #ddd; color: #555;
+          padding: 8px 14px; border-radius: 8px;
+          font-size: 13px; cursor: pointer; margin-bottom: 8px;
+        ">📍 זו לא התחנה שלי</button>
+      </div>
+      <div style="margin-top: 4px;">
+        <button class="prox-dismiss" style="
+          background: none; border: none; color: #bbb;
+          font-size: 13px; cursor: pointer;
+        ">דלג</button>
+      </div>
+    `;
+
+    function close() {
+      document.body.removeChild(overlay);
+      promptShown = false;
+    }
+
+    card.querySelector('.prox-yes').onclick = async () => {
+      await submitReport(station.id, true);
+      close();
+    };
+
+    card.querySelector('.prox-no').onclick = async () => {
+      await submitReport(station.id, false);
+      close();
+    };
+
+    card.querySelector('.prox-dismiss').onclick = close;
+
+    card.querySelector('.prox-wrong').onclick = () => {
+      showStationPickerPrompt(station, overlay);
+    };
+  }
+
+  function showStationPickerPrompt(excludeStation, overlay) {
+    const closest3 = getClosestStations(excludeStation.id, 3);
+    const card = overlay.querySelector('.prompt-card');
+
+    const stationButtons = closest3.map((s, i) => `
+      <button class="pick-station" data-index="${i}" style="
+        display: block; width: 100%; text-align: right;
+        background: #f5f5f5; border: 1px solid #ddd; color: #1a1a2e;
+        padding: 10px 14px; border-radius: 8px;
+        font-size: 13px; cursor: pointer; margin-bottom: 8px;
+      ">📍 ${s.name} <span style="color:#aaa; font-size:11px;">(${Math.round(s.dist)}מ')</span></button>
+    `).join('');
+
+    card.innerHTML = `
+      <div style="font-size: 32px; margin-bottom: 12px;">📍</div>
+      <div style="font-size: 15px; font-weight: bold; color: #1a1a2e; margin-bottom: 16px;">
+        באיזו תחנה אתה נמצא?
+      </div>
+      <div style="direction: rtl;">
+        ${stationButtons}
+      </div>
+      <div style="margin-top: 8px;">
+        <button class="prox-dismiss" style="
+          background: none; border: none; color: #bbb;
+          font-size: 13px; cursor: pointer;
+        ">דלג</button>
+      </div>
+    `;
+
+    function close() {
+      document.body.removeChild(overlay);
+      promptShown = false;
+    }
+
+    card.querySelector('.prox-dismiss').onclick = close;
+
+    card.querySelectorAll('.pick-station').forEach(btn => {
+      btn.onclick = () => {
+        const idx = parseInt(btn.dataset.index);
+        const chosenStation = closest3[idx];
+        snoozedStations[chosenStation.id] = Date.now();
+        showInspectorPrompt(chosenStation, overlay);
+      };
+    });
+  }
+
   function showProximityPrompt(station) {
     promptShown = true;
     snoozedStations[station.id] = Date.now();
@@ -145,69 +271,16 @@
       display: flex; align-items: center; justify-content: center;
       z-index: 9999;
     `;
-
     overlay.innerHTML = `
-      <div style="
+      <div class="prompt-card" style="
         background: white; border-radius: 16px;
         padding: 28px 24px; max-width: 300px; width: 90%;
         text-align: center; direction: rtl;
-      ">
-        <div style="font-size: 32px; margin-bottom: 12px;">🚌</div>
-        <div style="font-size: 16px; font-weight: bold; color: #1a1a2e; margin-bottom: 8px;">
-          נראה שאתה ב${station.name}
-        </div>
-        <div style="font-size: 14px; color: #666; margin-bottom: 20px;">
-          יש בודק?
-        </div>
-        <div style="display: flex; gap: 10px; justify-content: center;">
-          <button id="prox-yes" style="
-            background: #e74c3c; color: white; border: none;
-            padding: 10px 18px; border-radius: 8px;
-            font-size: 14px; font-weight: bold; cursor: pointer;
-          ">🚨 יש בודק</button>
-          <button id="prox-no" style="
-            background: #27ae60; color: white; border: none;
-            padding: 10px 18px; border-radius: 8px;
-            font-size: 14px; font-weight: bold; cursor: pointer;
-          ">✅ נקי</button>
-        </div>
-        <div style="margin-top: 14px;">
-          <button id="prox-dismiss" style="
-            background: none; border: none; color: #aaa;
-            font-size: 13px; cursor: pointer;
-          ">דלג</button>
-        </div>
-      </div>
+      "></div>
     `;
 
     document.body.appendChild(overlay);
-
-    function close() {
-      document.body.removeChild(overlay);
-      promptShown = false;
-    }
-
-    document.getElementById('prox-yes').onclick = async () => {
-      await fetch('/report', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ station_id: station.id, has_inspector: true, user_id: userId })
-      });
-      loadStations();
-      close();
-    };
-
-    document.getElementById('prox-no').onclick = async () => {
-      await fetch('/report', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ station_id: station.id, has_inspector: false, user_id: userId })
-      });
-      loadStations();
-      close();
-    };
-
-    document.getElementById('prox-dismiss').onclick = close;
+    showInspectorPrompt(station, overlay);
   }
 
   function startLocationTracking() {

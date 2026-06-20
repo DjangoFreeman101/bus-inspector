@@ -59,6 +59,47 @@
     localStorage.setItem('bus_inspector_uid', userId);
   }
 
+  // --- Service Worker registration ---
+  let swRegistration = null;
+
+  async function setupServiceWorker() {
+    if (!('serviceWorker' in navigator)) return;
+    try {
+      swRegistration = await navigator.serviceWorker.register('/sw.js');
+
+      // Listen for messages from service worker (e.g. open prompt from notification tap)
+      navigator.serviceWorker.addEventListener('message', (event) => {
+        if (event.data && event.data.type === 'OPEN_PROMPT' && event.data.stationId) {
+          const station = stationsData.find(s => s.id === event.data.stationId);
+          if (station && !promptShown) showProximityPrompt(station);
+        }
+      });
+    } catch (err) {
+      console.log('SW registration failed:', err);
+    }
+  }
+
+  async function requestNotificationPermission() {
+    if (!('Notification' in window)) return;
+    if (Notification.permission === 'default') {
+      await Notification.requestPermission();
+    }
+  }
+
+  async function sendProximityNotification(station) {
+    if (!swRegistration) return;
+    if (Notification.permission !== 'granted') return;
+    const reg = await navigator.serviceWorker.ready;
+    reg.active.postMessage({
+      type: 'SHOW_NOTIFICATION',
+      stationName: station.name,
+      stationId: station.id
+    });
+  }
+
+  setupServiceWorker();
+  requestNotificationPermission();
+
   const map = L.map('map').setView([31.9730, 34.7895], 14);
 
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -124,7 +165,8 @@
         nearStationId = closest.id;
         nearSince = now;
       } else if (now - nearSince >= NEAR_DURATION_MS) {
-        // Been here for 1 minute — show prompt
+        // Been here for 1 minute — show notification + in-app prompt
+        sendProximityNotification(closest);
         showProximityPrompt(closest);
       }
     } else {

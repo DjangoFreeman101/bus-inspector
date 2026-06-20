@@ -633,6 +633,10 @@ def manifest():
 def icon():
     return FileResponse("icon.png", media_type="image/png")
 
+@app.get("/sw.js")
+def service_worker():
+    return FileResponse("sw.js", media_type="application/javascript")
+
 @app.get("/stations")
 def get_stations():
     conn = get_db()

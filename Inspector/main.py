@@ -589,7 +589,6 @@ STATIONS = [
     {"id": 579, "name": "בנימין שמוטקין/התעשיין", "lat": 31.983695, "lon": 34.814951},
     {"id": 580, "name": "תחנה תפעולית/חניון מעוין שורק", "lat": 31.953053, "lon": 34.776262},
     {"id": 581, "name": "ראשון לציון/שרגא רפאלי", "lat": 32.105077, "lon": 34.87624},
-    {"id": 582, "name": "עזוז/מרכז", "lat": 30.792181, "lon": 34.472174}
 ]
 
 WINDOW_SECONDS = 5 * 60  # 5 minutes
@@ -601,14 +600,14 @@ def get_db():
 
 def init_db():
     conn = get_db()
-    # Drop old table if it has the old schema (single row per station)
     conn.execute("DROP TABLE IF EXISTS reports")
     conn.execute("""
         CREATE TABLE IF NOT EXISTS reports (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id TEXT NOT NULL,
             station_id INTEGER NOT NULL,
             has_inspector INTEGER NOT NULL,
-            reported_at REAL NOT NULL
+            reported_at REAL NOT NULL,
+            PRIMARY KEY (user_id, station_id)
         )
     """)
     conn.commit()
@@ -619,6 +618,7 @@ init_db()
 class Report(BaseModel):
     station_id: int
     has_inspector: bool
+    user_id: str
 
 @app.get("/", response_class=HTMLResponse)
 def root():
@@ -670,10 +670,13 @@ def get_stations():
 @app.post("/report")
 def post_report(report: Report):
     conn = get_db()
-    conn.execute(
-        "INSERT INTO reports (station_id, has_inspector, reported_at) VALUES (?, ?, ?)",
-        (report.station_id, int(report.has_inspector), time.time())
-    )
+    conn.execute("""
+        INSERT INTO reports (user_id, station_id, has_inspector, reported_at)
+        VALUES (?, ?, ?, ?)
+        ON CONFLICT(user_id, station_id) DO UPDATE SET
+            has_inspector = excluded.has_inspector,
+            reported_at = excluded.reported_at
+    """, (report.user_id, report.station_id, int(report.has_inspector), time.time()))
     conn.commit()
     conn.close()
     return {"ok": True}

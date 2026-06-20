@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, FileResponse
 from pydantic import BaseModel
 import sqlite3, time
 
@@ -624,6 +624,14 @@ class Report(BaseModel):
 def root():
     with open("index.html", "r", encoding="utf-8") as f:
         return f.read()
+
+@app.get("/manifest.json")
+def manifest():
+    return FileResponse("manifest.json", media_type="application/manifest+json")
+
+@app.get("/icon.png")
+def icon():
+    return FileResponse("icon.png", media_type="image/png")
 
 @app.get("/stations")
 def get_stations():

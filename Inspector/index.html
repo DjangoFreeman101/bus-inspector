@@ -113,13 +113,14 @@
 
   // Proximity state
   const PROXIMITY_METERS = 50;        // how close to trigger (meters)
-  const NEAR_DURATION_MS = 60 * 1000; // how long to be near before popup (1 min)
-  const SNOOZE_MS = 5 * 60 * 1000;   // how long to wait before asking again (5 min)
+  const NEAR_DURATION_MS = 20 * 1000; // 20 seconds near station before prompt
+  const SNOOZE_MS = 5 * 60 * 1000;   // 5 minutes before asking again
   const BOX_DEG = 0.005;              // ~500m bounding box in degrees
 
-  let nearStationId = null;       // which station user is currently near
-  let nearSince = null;           // timestamp when they arrived near it
-  let snoozedStations = {};       // stationId -> timestamp when snoozed
+  // Persist proximity state in localStorage so it survives app reopens
+  let nearStationId = localStorage.getItem('nearStationId') ? parseInt(localStorage.getItem('nearStationId')) : null;
+  let nearSince = localStorage.getItem('nearSince') ? parseInt(localStorage.getItem('nearSince')) : null;
+  let snoozedStations = JSON.parse(localStorage.getItem('snoozedStations') || '{}');
   let stationsData = [];          // latest stations list from server
   let promptShown = false;        // is prompt currently visible?
 
@@ -136,6 +137,7 @@
 
   function checkProximity() {
     if (userLat === null || stationsData.length === 0 || promptShown) return;
+
 
     const now = Date.now();
 
@@ -156,6 +158,7 @@
       }
     }
 
+
     if (closest && closestDist <= PROXIMITY_METERS) {
       // Check if snoozed
       if (snoozedStations[closest.id] && now - snoozedStations[closest.id] < SNOOZE_MS) return;
@@ -164,6 +167,8 @@
         // Just arrived near this station
         nearStationId = closest.id;
         nearSince = now;
+        localStorage.setItem('nearStationId', nearStationId);
+        localStorage.setItem('nearSince', nearSince);
       } else if (now - nearSince >= NEAR_DURATION_MS) {
         // Been here for 1 minute — show notification + in-app prompt
         sendProximityNotification(closest);
@@ -173,6 +178,8 @@
       // Not near any station
       nearStationId = null;
       nearSince = null;
+      localStorage.removeItem('nearStationId');
+      localStorage.removeItem('nearSince');
     }
   }
 
@@ -305,6 +312,7 @@
   function showProximityPrompt(station) {
     promptShown = true;
     snoozedStations[station.id] = Date.now();
+    localStorage.setItem('snoozedStations', JSON.stringify(snoozedStations));
 
     const overlay = document.createElement('div');
     overlay.style.cssText = `
@@ -437,6 +445,14 @@
 
   loadStations();
   setInterval(loadStations, 15000); // refresh every 15 seconds
+
+  // When user returns to the app, immediately check proximity
+  // This handles the case where the browser throttled the interval while minimized
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+      checkProximity();
+    }
+  });
 </script>
 </body>
 </html>

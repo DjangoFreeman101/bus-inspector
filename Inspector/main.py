@@ -597,7 +597,6 @@ STATIONS = [
     {"id": 37567, "name": "בנימין שמוטקין/התעשיין", "lat": 31.983695, "lon": 34.814951},
     {"id": 2883, "name": "תחנה תפעולית/חניון מעוין שורק", "lat": 31.953053, "lon": 34.776262},
     {"id": 3404, "name": "ראשון לציון/שרגא רפאלי", "lat": 32.105077, "lon": 34.87624},
-    {"id": 582, "name": "עזוז/מרכז", "lat": 30.792181, "lon": 34.472174},
     #Rosh Haayin
     {"id": 39650, "name": "בית ספר רמב''ם/הרב שלום שבזי", "lat": 32.090333, "lon": 34.948825},
     {"id": 39660, "name": "פארק סיבל/יציאה מכביש 5", "lat": 32.10624, "lon": 34.961352},
@@ -910,6 +909,10 @@ def icon():
 @app.get("/sw.js")
 def service_worker():
     return FileResponse("sw.js", media_type="application/javascript")
+
+@app.get("/privacy")
+def privacy():
+    return FileResponse("privacy_policy.html", media_type="text/html")
 
 @app.get("/stations")
 def get_stations():

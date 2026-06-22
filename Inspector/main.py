@@ -597,7 +597,7 @@ STATIONS = [
     {"id": 37567, "name": "בנימין שמוטקין/התעשיין", "lat": 31.983695, "lon": 34.814951},
     {"id": 2883, "name": "תחנה תפעולית/חניון מעוין שורק", "lat": 31.953053, "lon": 34.776262},
     {"id": 3404, "name": "ראשון לציון/שרגא רפאלי", "lat": 32.105077, "lon": 34.87624},
-    #Rosh Haayin
+,
     {"id": 39650, "name": "בית ספר רמב''ם/הרב שלום שבזי", "lat": 32.090333, "lon": 34.948825},
     {"id": 39660, "name": "פארק סיבל/יציאה מכביש 5", "lat": 32.10624, "lon": 34.961352},
     {"id": 39661, "name": "מחלף ראש העין מזרח", "lat": 32.107139, "lon": 34.961855},
@@ -915,7 +915,12 @@ def privacy():
     return FileResponse("privacy_policy.html", media_type="text/html")
 
 @app.get("/stations")
-def get_stations():
+def get_stations(
+    lat_min: float = None,
+    lat_max: float = None,
+    lon_min: float = None,
+    lon_max: float = None
+):
     conn = get_db()
     now = time.time()
     cutoff = now - WINDOW_SECONDS
@@ -938,8 +943,13 @@ def get_stations():
         else:
             votes[sid]["no"] += 1
 
+    # Filter stations by bounding box if provided
+    stations = STATIONS
+    if lat_min is not None and lat_max is not None and lon_min is not None and lon_max is not None:
+        stations = [s for s in STATIONS if lat_min <= s["lat"] <= lat_max and lon_min <= s["lon"] <= lon_max]
+
     result = []
-    for s in STATIONS:
+    for s in stations:
         v = votes.get(s["id"])
         if v:
             has_inspector = v["yes"] > v["no"]

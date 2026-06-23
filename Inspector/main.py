@@ -2726,6 +2726,14 @@ def get_stations(
         (cutoff,)
     )
     rows = cur.fetchall()
+
+    # Get last inspector report time per station (all time)
+    cur.execute(
+        "SELECT station_id, MAX(reported_at) as last_seen FROM reports WHERE has_inspector = true GROUP BY station_id"
+    )
+    last_seen_rows = cur.fetchall()
+    last_seen = {row["station_id"]: row["last_seen"] for row in last_seen_rows}
+
     cur.close()
     conn.close()
 
@@ -2754,12 +2762,15 @@ def get_stations(
         else:
             has_inspector = None
             total = 0
+        last_ts = last_seen.get(s["id"])
         result.append({
             **s,
             "has_inspector": has_inspector,
             "yes_votes": v["yes"] if v else 0,
             "no_votes": v["no"] if v else 0,
             "total_votes": total,
+            "last_inspector_time": last_ts,
+            "danger_level": None,  # populated later from historical data
         })
     return result
 

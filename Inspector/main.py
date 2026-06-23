@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-import sqlite3, time
+import psycopg2, psycopg2.extras, time, os
 
 app = FastAPI()
 
@@ -13,7 +13,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-DB = "inspector.db"
 
 STATIONS = [
     #--------------------------------Petach Tiqva
@@ -2662,23 +2661,23 @@ STATIONS = [
 WINDOW_SECONDS = 5 * 60  # 5 minutes
 
 def get_db():
-    conn = sqlite3.connect(DB)
-    conn.row_factory = sqlite3.Row
+    conn = psycopg2.connect(os.environ["DATABASE_URL"])
     return conn
 
 def init_db():
     conn = get_db()
-    conn.execute("DROP TABLE IF EXISTS reports")
-    conn.execute("""
+    cur = conn.cursor()
+    cur.execute("""
         CREATE TABLE IF NOT EXISTS reports (
             user_id TEXT NOT NULL,
             station_id INTEGER NOT NULL,
-            has_inspector INTEGER NOT NULL,
-            reported_at REAL NOT NULL,
+            has_inspector BOOLEAN NOT NULL,
+            reported_at DOUBLE PRECISION NOT NULL,
             PRIMARY KEY (user_id, station_id)
         )
     """)
     conn.commit()
+    cur.close()
     conn.close()
 
 init_db()
@@ -2717,14 +2716,17 @@ def get_stations(
     lon_max: float = None
 ):
     conn = get_db()
+    cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
     now = time.time()
     cutoff = now - WINDOW_SECONDS
 
     # Get all reports in last 5 minutes
-    rows = conn.execute(
-        "SELECT station_id, has_inspector FROM reports WHERE reported_at >= ?",
+    cur.execute(
+        "SELECT station_id, has_inspector FROM reports WHERE reported_at >= %s",
         (cutoff,)
-    ).fetchall()
+    )
+    rows = cur.fetchall()
+    cur.close()
     conn.close()
 
     # Count yes/no votes per station
@@ -2764,13 +2766,15 @@ def get_stations(
 @app.post("/report")
 def post_report(report: Report):
     conn = get_db()
-    conn.execute("""
+    cur = conn.cursor()
+    cur.execute("""
         INSERT INTO reports (user_id, station_id, has_inspector, reported_at)
-        VALUES (?, ?, ?, ?)
+        VALUES (%s, %s, %s, %s)
         ON CONFLICT(user_id, station_id) DO UPDATE SET
-            has_inspector = excluded.has_inspector,
-            reported_at = excluded.reported_at
-    """, (report.user_id, report.station_id, int(report.has_inspector), time.time()))
+            has_inspector = EXCLUDED.has_inspector,
+            reported_at = EXCLUDED.reported_at
+    """, (report.user_id, report.station_id, report.has_inspector, time.time()))
     conn.commit()
+    cur.close()
     conn.close()
     return {"ok": True}

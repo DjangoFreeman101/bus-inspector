@@ -2708,6 +2708,17 @@ def service_worker():
 def privacy():
     return FileResponse("privacy_policy.html", media_type="text/html")
 
+@app.get("/search")
+def search_stations(q: str = ""):
+    if not q or len(q) < 1:
+        return []
+    q_lower = q.strip()
+    results = [
+        s for s in STATIONS
+        if q_lower in s["name"] or q_lower in str(s["id"])
+    ]
+    return results[:30]
+
 @app.get("/stations")
 def get_stations(
     lat_min: float = None,

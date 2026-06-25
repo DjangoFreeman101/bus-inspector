@@ -1,6 +1,6 @@
 {
-  "name": "בודק אוטובוס",
-  "short_name": "בודק אוטובוס",
+  "name": "פקח אלרט",
+  "short_name": "פקח אלרט",
   "description": "דווח על בודקים בתחנות האוטובוס בראשון לציון",
   "start_url": "/",
   "display": "standalone",

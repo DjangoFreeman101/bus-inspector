@@ -3,11 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>בודק אוטובוס</title>
+  <title>דווח על פקח</title>
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#1a1a2e">
   <link rel="apple-touch-icon" href="/icon.png">
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"/>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Segoe UI', sans-serif; background: #f5f5f5; }
@@ -26,7 +29,73 @@
       width: 100%;
     }
 
-    .popup-box { text-align: center; min-width: 200px; }
+    .popup-box { text-align: center; min-width: 200px; position: relative; }
+
+    .popup-info-btn {
+      position: absolute;
+      top: 0;
+      left: 0;
+      background: none;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+      color: #aaa;
+      padding: 2px 6px;
+      line-height: 1;
+    }
+    .popup-info-btn:hover { color: #555; }
+
+    .station-info-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 9998;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .station-info-card {
+      background: white;
+      border-radius: 16px;
+      padding: 24px 20px;
+      max-width: 300px;
+      width: 90%;
+      direction: rtl;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+    }
+
+    .station-info-card h3 {
+      font-size: 16px;
+      color: #1a1a2e;
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid #f5f5f5;
+      font-size: 13px;
+    }
+
+    .info-label { color: #888; }
+    .info-value { color: #1a1a2e; font-weight: bold; }
+
+    .info-close-btn {
+      margin-top: 16px;
+      width: 100%;
+      padding: 10px;
+      background: #1a1a2e;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
     .popup-name { font-size: 14px; font-weight: bold; margin-bottom: 6px; color: #1a1a2e; }
     .popup-status { font-size: 13px; margin-bottom: 4px; color: #555; }
     .popup-votes { font-size: 12px; color: #888; margin-bottom: 12px; }
@@ -43,14 +112,402 @@
     .btn:hover { opacity: 0.85; }
     .btn-red   { background: #e74c3c; color: white; }
     .btn-green { background: #27ae60; color: white; }
+
+    #hamburger {
+      position: absolute;
+      top: 50%;
+      left: 14px;
+      transform: translateY(-50%);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      z-index: 10;
+    }
+
+    #hamburger span {
+      display: block;
+      width: 22px;
+      height: 2px;
+      background: white;
+      border-radius: 2px;
+    }
+
+    #side-menu {
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      width: 260px;
+      background: white;
+      z-index: 3000;
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+      direction: rtl;
+      box-shadow: 4px 0 20px rgba(0,0,0,0.2);
+      display: flex;
+      flex-direction: column;
+    }
+
+    #side-menu.open { transform: translateX(0); }
+
+    #menu-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.4);
+      z-index: 2999;
+      display: none;
+    }
+
+    #menu-overlay.open { display: block; }
+
+    #menu-header {
+      background: #1a1a2e;
+      color: white;
+      padding: 20px 16px;
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    .menu-item {
+      padding: 16px;
+      font-size: 15px;
+      color: #1a1a2e;
+      border-bottom: 1px solid #f0f0f0;
+      cursor: pointer;
+    }
+
+    .menu-item:hover { background: #f9f9f9; }
+
+    #about-panel {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: white;
+      z-index: 4000;
+      direction: rtl;
+      padding: 24px 20px;
+      display: none;
+      flex-direction: column;
+    }
+
+    #about-panel.open { display: flex; }
+
+    #about-back {
+      background: none;
+      border: none;
+      font-size: 15px;
+      color: #1a1a2e;
+      cursor: pointer;
+      margin-bottom: 20px;
+      text-align: right;
+    }
+
+    #loading {
+      position: fixed;
+      top: 60px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(26,26,46,0.85);
+      color: white;
+      padding: 8px 20px;
+      border-radius: 20px;
+      font-size: 13px;
+      z-index: 9999;
+      pointer-events: none;
+      direction: rtl;
+    }
+
+    #toast {
+      position: fixed;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.8);
+      color: white;
+      padding: 10px 20px;
+      border-radius: 20px;
+      font-size: 13px;
+      z-index: 9999;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+      white-space: nowrap;
+      direction: rtl;
+    }
+    #toast.show { opacity: 1; }
+
+    #goto-btn {
+      position: fixed;
+      bottom: 78px;
+      right: 16px;
+      background: white;
+      border: none;
+      border-radius: 50%;
+      width: 44px;
+      height: 44px;
+      font-size: 26px;
+      font-weight: 900;
+      cursor: pointer;
+      z-index: 1000;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #center-btn {
+      position: fixed;
+      bottom: 24px;
+      right: 16px;
+      background: white;
+      border: none;
+      border-radius: 50%;
+      width: 44px;
+      height: 44px;
+      font-size: 20px;
+      cursor: pointer;
+      z-index: 1000;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #goto-panel {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      background: white;
+      border-radius: 20px 20px 0 0;
+      padding: 20px 16px;
+      z-index: 2000;
+      max-height: 70vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 -4px 20px rgba(0,0,0,0.2);
+      transform: translateY(100%);
+      transition: transform 0.3s ease;
+      direction: rtl;
+    }
+
+    #goto-panel.open { transform: translateY(0); }
+
+    #goto-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.4);
+      z-index: 1999;
+      display: none;
+    }
+
+    #goto-overlay.open { display: block; }
+
+    #goto-search {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      font-size: 15px;
+      margin-bottom: 12px;
+      direction: rtl;
+      box-sizing: border-box;
+    }
+
+    #goto-results {
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    #manual-report-btn {
+      position: fixed;
+      bottom: 24px;
+      left: 16px;
+      background: #1a1a2e;
+      color: white;
+      border: none;
+      border-radius: 24px;
+      padding: 12px 18px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      z-index: 1000;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+    }
+
+    #manual-panel {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      background: white;
+      border-radius: 20px 20px 0 0;
+      padding: 20px 16px;
+      z-index: 2000;
+      max-height: 70vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 -4px 20px rgba(0,0,0,0.2);
+      transform: translateY(100%);
+      transition: transform 0.3s ease;
+      direction: rtl;
+    }
+
+    #manual-panel.open {
+      transform: translateY(0);
+    }
+
+    #manual-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.4);
+      z-index: 1999;
+      display: none;
+    }
+
+    #manual-overlay.open { display: block; }
+
+    #manual-search {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      font-size: 15px;
+      margin-bottom: 12px;
+      direction: rtl;
+      box-sizing: border-box;
+    }
+
+    #manual-results {
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .manual-station-item {
+      padding: 12px 8px;
+      border-bottom: 1px solid #f0f0f0;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .manual-station-item:hover {
+      background: #f9f9f9;
+    }
+
+    .station-item-name { font-size: 14px; color: #1a1a2e; }
+    .station-item-code { font-size: 12px; color: #aaa; }
   </style>
 </head>
 <body>
 
-<div id="header">🚌 בודק אוטובוס — ראשון לציון</div>
+<div id="header" style="position:relative;">
+  <div id="hamburger" onclick="openMenu()">
+    <span></span><span></span><span></span>
+  </div>
+  פקח אלרט
+</div>
 <div id="map"></div>
 
+<div id="menu-overlay" onclick="closeMenu()"></div>
+<div id="side-menu">
+  <div id="menu-header">🚌 תפריט</div>
+  <div class="menu-item" onclick="openAbout()">ℹ️ אודות</div>
+  <div class="menu-item" onclick="window.location.href='mailto:ybg1998@gmail.com'">✉️ צרו קשר</div>
+  <div class="menu-item" onclick="openPrivacy()">🔒 מדיניות פרטיות</div>
+</div>
+
+<div id="about-panel">
+  <button id="about-back" onclick="closeAbout()">→ חזרה</button>
+  <h2 style="margin-bottom:16px; color:#1a1a2e;">אודות</h2>
+  <p style="font-size:15px; line-height:1.7; color:#333;">"פקח אלרט" היא אפליקציה שמטרתה ליידע את הציבור על מיקומם של פקחים, במרחב הציבורי.<br><br>איכות המידע תלויה לחלוטין באמינות הדיווח שלך! על כן, בעת שימוש באפליקציה יש להיות אחראי ואמין.<br><br>&copy; כל הזכויות שמורות י.ב.ג</p>
+</div>
+
+<div id="privacy-panel" style="
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: white; z-index: 4000; direction: rtl;
+  padding: 24px 20px; display: none; flex-direction: column;
+  overflow-y: auto;
+">
+  <button onclick="closePrivacy()" style="
+    background: none; border: none; font-size: 15px;
+    color: #1a1a2e; cursor: pointer; margin-bottom: 20px; text-align: right;
+  ">→ חזרה</button>
+  <h2 style="margin-bottom:6px; color:#1a1a2e;">מדיניות פרטיות — פקח אלרט</h2>
+  <p style="color:#888; font-size:12px; margin-bottom:20px;">עדכון אחרון: יוני 2026</p>
+
+  <p style="font-size:14px; line-height:1.8; color:#333; margin-bottom:14px;">אפליקציית <strong>פקח אלרט</strong> פותחה על ידי <strong>יוגב ברגיל</strong>, ישראל. מדיניות פרטיות זו מסבירה כיצד האפליקציה אוספת, משתמשת ומגינה על המידע שלך.</p>
+
+  <h3 style="color:#1a1a2e; margin-bottom:8px;">1. מידע שנאסף</h3>
+  <p style="font-size:14px; line-height:1.8; color:#333; margin-bottom:14px;"><strong>מיקום:</strong> האפליקציה אוספת את מיקומך הגיאוגרפי בזמן אמת לצורך זיהוי תחנות אוטובוס הסמוכות אליך והצגת מיקומך על המפה. מידע המיקום אינו נשמר בשרתינו ואינו משותף עם צדדים שלישיים.<br><br><strong>מזהה משתמש אנונימי:</strong> האפליקציה יוצרת מזהה אקראי ואנונימי המאוחסן במכשירך בלבד. מזהה זה משמש למניעת דיווחים כפולים מאותו משתמש.<br><br><strong>דיווחים:</strong> כאשר אתה מדווח על נוכחות או היעדר פקח בתחנה, נשמרים בשרת מזהה התחנה, תוכן הדיווח ומזהה המשתמש האנונימי. אין שמירה של שם, כתובת אימייל, מספר טלפון או כל מידע מזהה אחר.</p>
+
+  <h3 style="color:#1a1a2e; margin-bottom:8px;">2. כיצד נעשה שימוש במידע</h3>
+  <p style="font-size:14px; line-height:1.8; color:#333; margin-bottom:14px;">המידע הנאסף משמש אך ורק לצורך הצגת מצב תחנות האוטובוס בזמן אמת למשתמשים אחרים באפליקציה.</p>
+
+  <h3 style="color:#1a1a2e; margin-bottom:8px;">3. שיתוף מידע עם צדדים שלישיים</h3>
+  <p style="font-size:14px; line-height:1.8; color:#333; margin-bottom:14px;">איננו מוכרים, סוחרים או מעבירים את המידע שלך לצדדים שלישיים.</p>
+
+  <h3 style="color:#1a1a2e; margin-bottom:8px;">4. אחסון מידע</h3>
+  <p style="font-size:14px; line-height:1.8; color:#333; margin-bottom:14px;">דיווחים נשמרים במסד הנתונים שלנו לצורך ניתוח סטטיסטי ושיפור האפליקציה. המידע המוצג למשתמשים מתייחס לדיווחים מ-5 הדקות האחרונות בלבד. המידע האנונימי הגולמי נשמר לצורך מחקר ושיפור מתמיד של השירות. אין שמירה של מידע מזהה אישי בשום שלב.</p>
+
+  <h3 style="color:#1a1a2e; margin-bottom:8px;">5. הרשאות האפליקציה</h3>
+  <p style="font-size:14px; line-height:1.8; color:#333; margin-bottom:14px;"><strong>מיקום ("כל הזמן"):</strong> נדרש לצורך זיהוי תחנות סמוכות ושליחת התראות.<br><br><strong>התראות:</strong> נדרש לצורך שליחת התראה כאשר אתה נמצא בסמוך לתחנת אוטובוס.</p>
+
+  <h3 style="color:#1a1a2e; margin-bottom:8px;">6. פרטיות ילדים</h3>
+  <p style="font-size:14px; line-height:1.8; color:#333; margin-bottom:14px;">האפליקציה אינה מיועדת לילדים מתחת לגיל 13.</p>
+
+  <h3 style="color:#1a1a2e; margin-bottom:8px;">7. יצירת קשר</h3>
+  <p style="font-size:14px; line-height:1.8; color:#333; margin-bottom:20px;">לשאלות בנושא פרטיות: <a href="mailto:ybg1998@gmail.com">ybg1998@gmail.com</a></p>
+
+  <p style="color:#aaa; font-size:12px;">&copy; כל הזכויות שמורות יוגב ברגיל, 2026</p>
+</div>
+
+<button id="manual-report-btn" onclick="openManualPanel()">✏️ דווח ידנית</button>
+<button id="goto-btn" onclick="openGotoPanel()" title="עבור לתחנה">
+  <img src="data:image/png;base64,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" width="24" height="24" style="display:block;"/>
+</button>
+<button id="center-btn" onclick="centerOnUser()" title="מרכז מפה">📍</button>
+
+<div id="goto-overlay" onclick="closeGotoPanel()"></div>
+<div id="goto-panel">
+  <div style="text-align:center; font-size:16px; font-weight:bold; margin-bottom:14px; color:#1a1a2e;">
+    עבור לתחנה
+  </div>
+  <input id="goto-search" type="text" placeholder="שם תחנה או מספר תחנה..." oninput="filterGotoStations()" />
+  <div id="goto-results"></div>
+</div>
+<div id="toast"></div>
+<div id="loading">⏳ טוען נתונים...</div>
+
+<div id="manual-overlay" onclick="closeManualPanel()"></div>
+<div id="manual-panel">
+  <div style="text-align:center; font-size:16px; font-weight:bold; margin-bottom:14px; color:#1a1a2e;">
+    דווח על תחנה
+  </div>
+  <input id="manual-search" type="text" placeholder="שם תחנה או מספר תחנה..." oninput="filterManualStations()" />
+  <div id="manual-results"></div>
+</div>
+
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+<script>
+  function initCapacitorPlugins() {
+    if (window.Capacitor && window.Capacitor.Plugins) {
+      window.BackgroundGeolocation = window.Capacitor.Plugins.BackgroundGeolocation;
+      window.LocalNotifications = window.Capacitor.Plugins.LocalNotifications;
+      window.Haptics = window.Capacitor.Plugins.Haptics;
+      return true;
+    }
+    return false;
+  }
+
+  // Try immediately
+  if (!initCapacitorPlugins()) {
+    // If not ready, keep trying every 100ms for up to 3 seconds
+    let attempts = 0;
+    const interval = setInterval(() => {
+      attempts++;
+      if (initCapacitorPlugins() || attempts > 30) {
+        clearInterval(interval);
+      }
+    }, 100);
+  }
+</script>
 <script>
   // Generate or retrieve persistent user ID
   let userId = localStorage.getItem('bus_inspector_uid');
@@ -58,6 +515,46 @@
     userId = 'user_' + Math.random().toString(36).substr(2, 12);
     localStorage.setItem('bus_inspector_uid', userId);
   }
+
+  // Detect if running as native app or in browser
+  const proto = window.location.protocol;
+  const host = window.location.hostname;
+  const isNativeApp = (proto === 'capacitor:' || proto === 'ionic:' || proto === 'file:' || host === 'localhost');
+  const API_BASE = isNativeApp ? 'https://bus-inspector.onrender.com' : '';
+
+  // Request all permissions on native app
+  async function requestAllPermissions() {
+    if (!isNativeApp) return;
+
+    // Wait for Capacitor plugins to be ready
+    let attempts = 0;
+    while (attempts < 30) {
+      if (window.LocalNotifications && window.Capacitor) break;
+      await new Promise(r => setTimeout(r, 200));
+      attempts++;
+    }
+
+    // Request notification permission
+    if (window.LocalNotifications) {
+      try {
+        await window.LocalNotifications.requestPermissions();
+      } catch(e) {
+        console.log('notification permission error:', e);
+      }
+    }
+
+    // Request background location permission
+    if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Geolocation) {
+      try {
+        await window.Capacitor.Plugins.Geolocation.requestPermissions({ permissions: ['location', 'coarseLocation'] });
+      } catch(e) {
+        console.log('location permission error:', e);
+      }
+    }
+  }
+
+  requestAllPermissions();
+
 
   // --- Service Worker registration ---
   let swRegistration = null;
@@ -87,20 +584,52 @@
   }
 
   async function sendProximityNotification(station) {
-    if (!swRegistration) return;
-    if (Notification.permission !== 'granted') return;
-    const reg = await navigator.serviceWorker.ready;
-    reg.active.postMessage({
-      type: 'SHOW_NOTIFICATION',
-      stationName: station.name,
-      stationId: station.id
-    });
+    const isNative = window.Capacitor && window.Capacitor.isNativePlatform();
+
+    if (isNative && window.LocalNotifications) {
+      // Native Android — use Capacitor local notifications
+      try {
+        await window.LocalNotifications.requestPermissions();
+        await window.LocalNotifications.schedule({
+          notifications: [{
+            title: 'דווח על פקח 🚌',
+            body: `נראה שאתה ב${station.name}. יש פקח?`,
+            id: station.id,
+            extra: { stationId: station.id }
+          }]
+        });
+      } catch(e) {
+        console.log('Local notification error:', e);
+      }
+    } else {
+      // Browser — use service worker notification
+      if (!swRegistration) return;
+      if (Notification.permission !== 'granted') return;
+      const reg = await navigator.serviceWorker.ready;
+      reg.active.postMessage({
+        type: 'SHOW_NOTIFICATION',
+        stationName: station.name,
+        stationId: station.id
+      });
+    }
   }
 
   setupServiceWorker();
   requestNotificationPermission();
 
+
+
+  // Start centered on Rishon LeZion as fallback, then move to user location
   const map = L.map('map').setView([31.9730, 34.7895], 14);
+
+  // Center on user as soon as we get their location
+  let centeredOnUser = false;
+  function centerOnUserOnce(lat, lon) {
+    if (!centeredOnUser) {
+      centeredOnUser = true;
+      map.setView([lat, lon], 15);
+    }
+  }
 
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© OpenStreetMap contributors'
@@ -112,15 +641,18 @@
   let userLon = null;
 
   // Proximity state
-  const PROXIMITY_METERS = 50;        // how close to trigger (meters)
+  const PROXIMITY_METERS = 50;        // how close to trigger for reporting (meters)
   const NEAR_DURATION_MS = 20 * 1000; // 20 seconds near station before prompt
   const SNOOZE_MS = 5 * 60 * 1000;   // 5 minutes before asking again
   const BOX_DEG = 0.005;              // ~500m bounding box in degrees
+  const ALERT_METERS = 100;           // how close to trigger inspector warning
+  const ALERT_SNOOZE_MS = 5 * 60 * 1000; // 5 min snooze per station for alerts
 
   // Persist proximity state in localStorage so it survives app reopens
   let nearStationId = localStorage.getItem('nearStationId') ? parseInt(localStorage.getItem('nearStationId')) : null;
   let nearSince = localStorage.getItem('nearSince') ? parseInt(localStorage.getItem('nearSince')) : null;
   let snoozedStations = JSON.parse(localStorage.getItem('snoozedStations') || '{}');
+  let alertedStations = JSON.parse(localStorage.getItem('alertedStations') || '{}');
   let stationsData = [];          // latest stations list from server
   let promptShown = false;        // is prompt currently visible?
 
@@ -133,6 +665,24 @@
               Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
               Math.sin(dLon/2) ** 2;
     return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  }
+
+  async function sendInspectorAlert(station) {
+    const isNative = window.Capacitor && window.Capacitor.isNativePlatform();
+    if (isNative && window.LocalNotifications) {
+      try {
+        await window.LocalNotifications.schedule({
+          notifications: [{
+            title: '⚠️ שים לב — יש פקח!',
+            body: `יש פקח בתחנת ${station.name}`,
+            id: station.id + 100000,
+            sound: null
+          }]
+        });
+      } catch(e) {
+        console.log('Alert notification error:', e);
+      }
+    }
   }
 
   function checkProximity() {
@@ -158,6 +708,23 @@
       }
     }
 
+
+    // Inspector alert — check all candidates within 100m with active inspector
+    const myVotes = JSON.parse(localStorage.getItem('myVotes') || '{}');
+    const alertCandidates = candidates.filter(s =>
+      s.has_inspector === true &&
+      haversine(userLat, userLon, s.lat, s.lon) <= ALERT_METERS &&
+      myVotes[s.id] !== 'yes'  // don't alert if user reported this inspector themselves
+    );
+
+    for (const s of alertCandidates) {
+      const lastAlerted = alertedStations[s.id];
+      if (!lastAlerted || now - lastAlerted >= ALERT_SNOOZE_MS) {
+        alertedStations[s.id] = now;
+        localStorage.setItem('alertedStations', JSON.stringify(alertedStations));
+        sendInspectorAlert(s);
+      }
+    }
 
     if (closest && closestDist <= PROXIMITY_METERS) {
       // Check if snoozed
@@ -195,12 +762,77 @@
       .slice(0, count);
   }
 
+  function reportFeedback() {
+    // Vibration — use Capacitor Haptics on native, fallback to browser API
+    if (window.Haptics) {
+      window.Haptics.impact({ style: 'MEDIUM' });
+    } else if (navigator.vibrate) {
+      navigator.vibrate([50, 30, 50]);
+    }
+    // Duolingo-style cheerful ascending ding
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+
+      // Two-note ascending ding (like Duolingo's correct answer)
+      const notes = [
+        { freq: 523, start: 0,    duration: 0.12 },  // C5
+        { freq: 784, start: 0.1,  duration: 0.2  },  // G5
+      ];
+
+      notes.forEach(({ freq, start, duration }) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, ctx.currentTime + start);
+        gain.gain.setValueAtTime(0, ctx.currentTime + start);
+        gain.gain.linearRampToValueAtTime(0.35, ctx.currentTime + start + 0.01);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + start + duration);
+        osc.start(ctx.currentTime + start);
+        osc.stop(ctx.currentTime + start + duration);
+      });
+    } catch(e) {}
+  }
+
+  function showToast(msg) {
+    const toast = document.getElementById('toast');
+    toast.textContent = msg;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 3000);
+  }
+
+  const REPORT_RADIUS_METERS = 1000;
+
   async function submitReport(stationId, hasInspector) {
-    await fetch('/report', {
+    const station = stationsData.find(s => s.id === stationId);
+
+    // Block report if location unknown
+    if (userLat === null) {
+      showToast('⚠️ לא ניתן לדווח ללא גישה למיקום');
+      return;
+    }
+
+    // Check distance
+    if (station) {
+      const dist = haversine(userLat, userLon, station.lat, station.lon);
+      if (dist > REPORT_RADIUS_METERS) {
+        showToast('⚠️ לא ניתן לדווח על תחנה הרחוקה מעל 1 ק"מ ממך');
+        return;
+      }
+    }
+
+    // Track user's own votes for alert suppression
+    const myVotes = JSON.parse(localStorage.getItem('myVotes') || '{}');
+    myVotes[stationId] = hasInspector ? 'yes' : 'no';
+    localStorage.setItem('myVotes', JSON.stringify(myVotes));
+
+    await fetch(`${API_BASE}/report`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ station_id: stationId, has_inspector: hasInspector, user_id: userId })
     });
+    reportFeedback();
     loadStations();
   }
 
@@ -212,14 +844,14 @@
         נראה שאתה ב${station.name}
       </div>
       <div style="font-size: 14px; color: #666; margin-bottom: 20px;">
-        יש בודק?
+        יש פקח?
       </div>
       <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
         <button class="prox-yes" style="
           background: #e74c3c; color: white; border: none;
           padding: 10px 18px; border-radius: 8px;
           font-size: 14px; font-weight: bold; cursor: pointer;
-        ">🚨 יש בודק</button>
+        ">🚨 יש פקח</button>
         <button class="prox-no" style="
           background: #27ae60; color: white; border: none;
           padding: 10px 18px; border-radius: 8px;
@@ -333,38 +965,72 @@
     showInspectorPrompt(station, overlay);
   }
 
-  function startLocationTracking() {
+  function updateUserPosition(latitude, longitude) {
+    userLat = latitude;
+    userLon = longitude;
+    centerOnUserOnce(latitude, longitude);
+    if (!userMarker) {
+      const userIcon = L.divIcon({
+        html: `<div style="
+          width: 18px; height: 18px;
+          background: #2980b9;
+          border: 3px solid white;
+          border-radius: 50%;
+          box-shadow: 0 0 6px rgba(0,0,0,0.4);
+        "></div>`,
+        iconSize: [18, 18],
+        iconAnchor: [9, 9],
+        className: ''
+      });
+      userMarker = L.marker([userLat, userLon], { icon: userIcon, zIndexOffset: 1000 })
+        .addTo(map)
+        .bindPopup('📍 אתה כאן');
+    } else {
+      userMarker.setLatLng([userLat, userLon]);
+    }
+    checkProximity();
+  }
+
+  async function startLocationTracking() {
+    const isNative = window.Capacitor && window.Capacitor.isNativePlatform();
+
+    if (isNative && window.BackgroundGeolocation) {
+      // Native Android — use background geolocation plugin
+      try {
+        await window.BackgroundGeolocation.addWatcher(
+          {
+            backgroundMessage: 'ממתין לדיווח...',
+            backgroundTitle: 'דווח על פקח',
+            requestPermissions: true,
+            stale: false,
+            distanceFilter: 10
+          },
+          (location, error) => {
+            if (error) { console.log('BG geo error:', error); return; }
+            updateUserPosition(location.latitude, location.longitude);
+          }
+        );
+        console.log('Using background geolocation');
+      } catch(e) {
+        console.log('BG geo failed, falling back:', e);
+        startBrowserLocation();
+      }
+    } else {
+      // Browser / PWA — use regular watchPosition
+      startBrowserLocation();
+    }
+
+    // Check proximity every 30 seconds as backup
+    setInterval(checkProximity, 30000);
+  }
+
+  function startBrowserLocation() {
     if (!navigator.geolocation) return;
     navigator.geolocation.watchPosition(
-      (pos) => {
-        userLat = pos.coords.latitude;
-        userLon = pos.coords.longitude;
-        if (!userMarker) {
-          const userIcon = L.divIcon({
-            html: `<div style="
-              width: 18px; height: 18px;
-              background: #2980b9;
-              border: 3px solid white;
-              border-radius: 50%;
-              box-shadow: 0 0 6px rgba(0,0,0,0.4);
-            "></div>`,
-            iconSize: [18, 18],
-            iconAnchor: [9, 9],
-            className: ''
-          });
-          userMarker = L.marker([userLat, userLon], { icon: userIcon, zIndexOffset: 1000 })
-            .addTo(map)
-            .bindPopup('📍 אתה כאן');
-        } else {
-          userMarker.setLatLng([userLat, userLon]);
-        }
-      },
+      (pos) => updateUserPosition(pos.coords.latitude, pos.coords.longitude),
       (err) => console.log('Location error:', err),
       { enableHighAccuracy: true, maximumAge: 5000 }
     );
-
-    // Check proximity every 30 seconds
-    setInterval(checkProximity, 30000);
   }
 
   startLocationTracking();
@@ -394,53 +1060,274 @@
       const pct = Math.round((winningSide / s.total_votes) * 100);
       prob = ` (${pct}%)`;
     }
-    if (s.has_inspector) return `🔴 יש בודק${prob}`;
+    if (s.has_inspector) return `🔴 יש פקח${prob}`;
     return `🟢 נקי${prob}`;
   }
 
   function votesText(s) {
     if (s.total_votes === 0) return '';
-    return `${s.yes_votes} דיווחו יש בודק · ${s.no_votes} דיווחו נקי`;
+    return `${s.yes_votes} דיווחו יש פקח · ${s.no_votes} דיווחו נקי`;
   }
 
   async function report(stationId, hasInspector) {
-    await fetch('/report', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ station_id: stationId, has_inspector: hasInspector, user_id: userId })
-    });
-    loadStations();
+    await submitReport(stationId, hasInspector);
   }
 
   let markers = {};
+  const clusterGroup = L.markerClusterGroup({
+    maxClusterRadius: 40,
+    disableClusteringAtZoom: 16
+  });
+  map.addLayer(clusterGroup);
+
+  function formatLastSeen(ts) {
+    if (!ts) return 'אין מידע רלוונטי';
+    const diff = Math.floor((Date.now() / 1000) - ts);
+    if (diff > 14 * 86400) return 'אין מידע רלוונטי';
+    if (diff < 60) return 'לפני פחות מדקה';
+    if (diff < 3600) return `לפני ${Math.floor(diff / 60)} דקות`;
+    if (diff < 86400) return `לפני ${Math.floor(diff / 3600)} שעות`;
+    // Over 24 hours — show actual date and time
+    const date = new Date(ts * 1000);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${day}/${month} בשעה ${hours}:${minutes}`;
+  }
+
+  function showStationInfo(stationId) {
+    const s = stationsData.find(x => x.id === stationId);
+    if (!s) return;
+
+    const overlay = document.createElement('div');
+    overlay.className = 'station-info-overlay';
+    overlay.innerHTML = `
+      <div class="station-info-card">
+        <h3>📍 פרטי תחנה</h3>
+        <div class="info-row">
+          <span class="info-label">שם תחנה</span>
+          <span class="info-value">${s.name}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">מספר תחנה</span>
+          <span class="info-value">${s.id}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">פקח נראה לאחרונה</span>
+          <span class="info-value">${formatLastSeen(s.last_inspector_time)}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">רמת סיכון</span>
+          <span class="info-value">${s.danger_level !== null ? s.danger_level + '%' : 'בקרוב'}</span>
+        </div>
+        <button class="info-close-btn" onclick="this.closest('.station-info-overlay').remove()">סגור</button>
+      </div>
+    `;
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) overlay.remove();
+    });
+    document.body.appendChild(overlay);
+  }
+
+  function getPopupHTML(s) {
+    return `
+      <div class="popup-box">
+        <button class="popup-info-btn" onclick="showStationInfo(${s.id})">ℹ️</button>
+        <div class="popup-name">${s.name}</div>
+        <div style="font-size:11px; color:#bbb; margin-top:-4px; margin-bottom:6px;">${s.id}</div>
+        <div class="popup-status">${statusText(s)}</div>
+        <div class="popup-votes">${votesText(s)}</div>
+        <div class="popup-buttons">
+          <button class="btn btn-red"   onclick="report(${s.id}, true)">🚨 יש פקח</button>
+          <button class="btn btn-green" onclick="report(${s.id}, false)">✅ נקי</button>
+        </div>
+      </div>`;
+  }
 
   async function loadStations() {
-    const res = await fetch('/stations');
+    const bounds = map.getBounds();
+    const params = new URLSearchParams({
+      lat_min: bounds.getSouth().toFixed(5),
+      lat_max: bounds.getNorth().toFixed(5),
+      lon_min: bounds.getWest().toFixed(5),
+      lon_max: bounds.getEast().toFixed(5)
+    });
+
+    const res = await fetch(`${API_BASE}/stations?${params}`);
     const stations = await res.json();
-    stationsData = stations; // keep latest data for proximity checks
 
+    // Hide loading indicator after first successful load
+    const loadingEl = document.getElementById('loading');
+    if (loadingEl) loadingEl.remove();
+
+    // Merge into stationsData — keep all loaded stations for proximity detection
+    const newIds = new Set(stations.map(s => s.id));
     stations.forEach(s => {
-      const popupHTML = `
-        <div class="popup-box">
-          <div class="popup-name">${s.name}</div>
-          <div class="popup-status">${statusText(s)}</div>
-          <div class="popup-votes">${votesText(s)}</div>
-          <div class="popup-buttons">
-            <button class="btn btn-red"   onclick="report(${s.id}, true)">🚨 יש בודק</button>
-            <button class="btn btn-green" onclick="report(${s.id}, false)">✅ נקי</button>
-          </div>
-        </div>`;
+      const existing = stationsData.findIndex(x => x.id === s.id);
+      if (existing >= 0) stationsData[existing] = s;
+      else stationsData.push(s);
+    });
 
-      if (markers[s.id]) {
-        markers[s.id].setIcon(makeIcon(s.has_inspector));
-        markers[s.id].setPopupContent(popupHTML);
-      } else {
-        const m = L.marker([s.lat, s.lon], { icon: makeIcon(s.has_inspector) })
-          .addTo(map)
-          .bindPopup(popupHTML);
-        markers[s.id] = m;
+    // Remove markers outside current view
+    const viewBounds = map.getBounds();
+    Object.keys(markers).forEach(id => {
+      const m = markers[id];
+      const pos = m.getLatLng();
+      if (!viewBounds.contains(pos)) {
+        clusterGroup.removeLayer(m);
+        delete markers[id];
       }
     });
+
+    // Add or update markers in view
+    stations.forEach(s => {
+      if (markers[s.id]) {
+        markers[s.id].setIcon(makeIcon(s.has_inspector));
+        markers[s.id].setPopupContent(getPopupHTML(s));
+      } else {
+        const m = L.marker([s.lat, s.lon], { icon: makeIcon(s.has_inspector) })
+          .bindPopup(getPopupHTML(s));
+        markers[s.id] = m;
+        clusterGroup.addLayer(m);
+      }
+    });
+  }
+
+  // Reload when user pans or zooms
+  map.on('moveend', loadStations);
+
+  // --- Side menu ---
+  function openMenu() {
+    document.getElementById('side-menu').classList.add('open');
+    document.getElementById('menu-overlay').classList.add('open');
+  }
+
+  function closeMenu() {
+    document.getElementById('side-menu').classList.remove('open');
+    document.getElementById('menu-overlay').classList.remove('open');
+  }
+
+  function openPrivacy() {
+    closeMenu();
+    const panel = document.getElementById('privacy-panel');
+    panel.style.display = 'flex';
+  }
+
+  function closePrivacy() {
+    document.getElementById('privacy-panel').style.display = 'none';
+  }
+
+  function openAbout() {
+    closeMenu();
+    document.getElementById('about-panel').classList.add('open');
+  }
+
+  function closeAbout() {
+    document.getElementById('about-panel').classList.remove('open');
+  }
+
+  function openGotoPanel() {
+    document.getElementById('goto-panel').classList.add('open');
+    document.getElementById('goto-overlay').classList.add('open');
+    document.getElementById('goto-search').value = '';
+    filterGotoStations();
+    setTimeout(() => document.getElementById('goto-search').focus(), 350);
+  }
+
+  function closeGotoPanel() {
+    document.getElementById('goto-panel').classList.remove('open');
+    document.getElementById('goto-overlay').classList.remove('open');
+  }
+
+  let gotoDebounce = null;
+
+  function filterGotoStations() {
+    const query = document.getElementById('goto-search').value.trim();
+    const results = document.getElementById('goto-results');
+
+    if (!query) {
+      results.innerHTML = '<div style="color:#aaa;text-align:center;padding:20px;">הקלד שם או מספר תחנה</div>';
+      return;
+    }
+
+    // Debounce to avoid too many requests while typing
+    clearTimeout(gotoDebounce);
+    gotoDebounce = setTimeout(async () => {
+      const res = await fetch(`${API_BASE}/search?q=${encodeURIComponent(query)}`);
+      const stations = await res.json();
+
+      if (stations.length === 0) {
+        results.innerHTML = '<div style="color:#aaa;text-align:center;padding:20px;">לא נמצאו תחנות</div>';
+        return;
+      }
+
+      results.innerHTML = stations.map(s => `
+        <div class="manual-station-item" onclick="gotoStation(${s.id}, ${s.lat}, ${s.lon})">
+          <div class="station-item-name">${s.name}</div>
+          <div class="station-item-code">${s.id}</div>
+        </div>
+      `).join('');
+    }, 300);
+  }
+
+  function gotoStation(stationId, lat, lon) {
+    closeGotoPanel();
+    map.setView([lat, lon], 17);
+  }
+
+  function centerOnUser() {
+    if (userLat !== null && userLon !== null) {
+      map.setView([userLat, userLon], map.getZoom());
+    }
+  }
+
+  // --- Manual report panel ---
+  function openManualPanel() {
+    document.getElementById('manual-panel').classList.add('open');
+    document.getElementById('manual-overlay').classList.add('open');
+    document.getElementById('manual-search').value = '';
+    filterManualStations();
+    setTimeout(() => document.getElementById('manual-search').focus(), 350);
+  }
+
+  function closeManualPanel() {
+    document.getElementById('manual-panel').classList.remove('open');
+    document.getElementById('manual-overlay').classList.remove('open');
+  }
+
+  function filterManualStations() {
+    const query = document.getElementById('manual-search').value.trim();
+    const results = document.getElementById('manual-results');
+
+    if (!query) {
+      results.innerHTML = '<div style="color:#aaa;text-align:center;padding:20px;">הקלד שם או מספר תחנה</div>';
+      return;
+    }
+
+    const filtered = stationsData.filter(s =>
+      s.name.includes(query) ||
+      String(s.id).includes(query)
+    ).slice(0, 30);
+
+    if (filtered.length === 0) {
+      results.innerHTML = '<div style="color:#aaa;text-align:center;padding:20px;">לא נמצאו תחנות</div>';
+      return;
+    }
+
+    results.innerHTML = filtered.map(s => `
+      <div class="manual-station-item" onclick="selectManualStation(${s.id})">
+        <div class="station-item-name">${s.name}</div>
+        <div class="station-item-code">${s.id}</div>
+      </div>
+    `).join('');
+  }
+
+  function selectManualStation(stationId) {
+    const station = stationsData.find(s => s.id === stationId);
+    if (!station) return;
+    closeManualPanel();
+    showProximityPrompt(station);
   }
 
   loadStations();

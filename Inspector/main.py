@@ -17,7 +17,7 @@ app.add_middleware(
 
 def load_stations():
     stations = []
-    with open("stations.csv", encoding="utf-8") as f:
+    with open("stations.csv", encoding="utf-8-sig") as f:
         reader = csv_module.DictReader(f)
         for row in reader:
             stations.append({

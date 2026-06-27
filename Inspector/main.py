@@ -17,15 +17,22 @@ app.add_middleware(
 
 def load_stations():
     stations = []
-    with open("stations.csv", encoding="utf-8") as f:
-        reader = csv_module.DictReader(f)
-        for row in reader:
-            stations.append({
-                "id": int(row["stop_code"]),
-                "name": row["stop_name"],
-                "lat": float(row["stop_lat"]),
-                "lon": float(row["stop_lon"])
-            })
+    for enc in ["utf-8-sig", "utf-8", "latin-1"]:
+        try:
+            with open("stations.csv", encoding=enc) as f:
+                reader = csv_module.DictReader(f)
+                for row in reader:
+                    clean = {k.strip().lstrip("\ufeff"): v for k, v in row.items()}
+                    stations.append({
+                        "id": int(clean["stop_code"]),
+                        "name": clean["stop_name"],
+                        "lat": float(clean["stop_lat"]),
+                        "lon": float(clean["stop_lon"])
+                    })
+            break
+        except (UnicodeDecodeError, KeyError):
+            stations = []
+            continue
     return stations
 
 STATIONS = load_stations()
@@ -156,21 +163,6 @@ def get_stations(
             "danger_level": None,  # populated later from historical data
         })
     return result
-
-@app.get("/my-votes")
-def get_my_votes(user_id: str):
-    conn = get_db()
-    cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-    now = time.time()
-    cutoff = now - WINDOW_SECONDS
-    cur.execute(
-        "SELECT station_id, has_inspector FROM reports WHERE user_id = %s AND reported_at >= %s",
-        (user_id, cutoff)
-    )
-    rows = cur.fetchall()
-    cur.close()
-    conn.close()
-    return {str(row["station_id"]): "yes" if row["has_inspector"] else "no" for row in rows}
 
 @app.delete("/report")
 def delete_report(station_id: int, user_id: str):

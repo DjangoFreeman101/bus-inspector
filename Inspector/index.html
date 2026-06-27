@@ -112,6 +112,7 @@
     .btn:hover { opacity: 0.85; }
     .btn-red   { background: #e74c3c; color: white; }
     .btn-green { background: #27ae60; color: white; }
+    .btn-grey  { background: #bbb; color: white; }
 
     #hamburger {
       position: absolute;
@@ -822,9 +823,27 @@
       }
     }
 
-    // Track user's own votes for alert suppression
+    // Track user's own votes for alert suppression and cancel detection
     const myVotes = JSON.parse(localStorage.getItem('myVotes') || '{}');
-    myVotes[stationId] = hasInspector ? 'yes' : 'no';
+    const currentVote = myVotes[stationId];
+    const newVote = hasInspector ? 'yes' : 'no';
+
+    // If pressing same button again — cancel the report
+    if (currentVote === newVote) {
+      delete myVotes[stationId];
+      localStorage.setItem('myVotes', JSON.stringify(myVotes));
+      await fetch(`${API_BASE}/report?station_id=${stationId}&user_id=${encodeURIComponent(userId)}`, {
+        method: 'DELETE'
+      });
+      map.closePopup();
+      showToast('✅ הדיווח בוטל');
+      reportFeedback();
+      await syncMyVotes();
+      loadStations();
+      return;
+    }
+
+    myVotes[stationId] = newVote;
     localStorage.setItem('myVotes', JSON.stringify(myVotes));
 
     await fetch(`${API_BASE}/report`, {
@@ -833,6 +852,8 @@
       body: JSON.stringify({ station_id: stationId, has_inspector: hasInspector, user_id: userId })
     });
     reportFeedback();
+    map.closePopup();
+    await syncMyVotes();
     loadStations();
   }
 
@@ -1073,10 +1094,39 @@
     await submitReport(stationId, hasInspector);
   }
 
+  async function cancelReport(stationId) {
+    const url = `${API_BASE}/report?station_id=${stationId}&user_id=${encodeURIComponent(userId)}`;
+    alert('DELETE URL: ' + url);
+    const res = await fetch(url, {
+      method: 'DELETE'
+    });
+    const data = await res.json();
+    alert('Response: ' + JSON.stringify(data));
+    map.closePopup();
+    showToast('✅ הדיווח בוטל');
+    reportFeedback();
+    // Update stationsData locally immediately
+    const s = stationsData.find(x => x.id === stationId);
+    if (s) {
+      s.yes_votes = Math.max(0, (s.yes_votes || 1) - 1);
+      s.no_votes = s.no_votes || 0;
+      s.total_votes = s.yes_votes + s.no_votes;
+      s.has_inspector = s.total_votes === 0 ? null : s.yes_votes > s.no_votes;
+      if (markers[stationId]) {
+        markers[stationId].setIcon(makeIcon(s.has_inspector));
+        markers[stationId].setPopupContent(getPopupHTML(s));
+      }
+    }
+    setTimeout(loadStations, 1000);
+  }
+
   let markers = {};
+  const MIN_ZOOM = 12; // minimum zoom to fetch stations
+
   const clusterGroup = L.markerClusterGroup({
-    maxClusterRadius: 40,
-    disableClusteringAtZoom: 16
+    maxClusterRadius: 80,
+    disableClusteringAtZoom: 16,
+    spiderfyOnMaxZoom: true
   });
   map.addLayer(clusterGroup);
 
@@ -1141,11 +1191,20 @@
         <div class="popup-buttons">
           <button class="btn btn-red"   onclick="report(${s.id}, true)">🚨 יש פקח</button>
           <button class="btn btn-green" onclick="report(${s.id}, false)">✅ נקי</button>
+          <button class="btn btn-grey"  onclick="cancelReport(${s.id})">✖ בטל</button>
         </div>
       </div>`;
   }
 
   async function loadStations() {
+    // Don't fetch if zoomed out too far
+    if (map.getZoom() < MIN_ZOOM) {
+      // Remove all markers when zoomed out
+      clusterGroup.clearLayers();
+      Object.keys(markers).forEach(id => delete markers[id]);
+      return;
+    }
+
     const bounds = map.getBounds();
     const params = new URLSearchParams({
       lat_min: bounds.getSouth().toFixed(5),
@@ -1278,7 +1337,7 @@
 
   function centerOnUser() {
     if (userLat !== null && userLon !== null) {
-      map.setView([userLat, userLon], map.getZoom());
+      map.flyTo([userLat, userLon], 15);
     }
   }
 
@@ -1330,6 +1389,18 @@
     showProximityPrompt(station);
   }
 
+  // Sync user's votes from server on startup
+  async function syncMyVotes() {
+    try {
+      const res = await fetch(`${API_BASE}/my-votes?user_id=${encodeURIComponent(userId)}`);
+      const votes = await res.json();
+      localStorage.setItem('myVotes', JSON.stringify(votes));
+    } catch(e) {
+      console.log('Failed to sync votes:', e);
+    }
+  }
+
+  syncMyVotes();
   loadStations();
   setInterval(loadStations, 15000); // refresh every 15 seconds
 

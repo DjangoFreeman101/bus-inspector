@@ -17,7 +17,7 @@ app.add_middleware(
 
 def load_stations():
     stations = []
-    with open("stations.csv", encoding="utf-8-sig") as f:
+    with open("stations.csv", encoding="utf-8") as f:
         reader = csv_module.DictReader(f)
         for row in reader:
             stations.append({
@@ -156,6 +156,19 @@ def get_stations(
             "danger_level": None,  # populated later from historical data
         })
     return result
+
+@app.delete("/report")
+def delete_report(station_id: int, user_id: str):
+    conn = get_db()
+    cur = conn.cursor()
+    cur.execute(
+        "DELETE FROM reports WHERE user_id = %s AND station_id = %s",
+        (user_id, station_id)
+    )
+    conn.commit()
+    cur.close()
+    conn.close()
+    return {"ok": True}
 
 @app.post("/report")
 def post_report(report: Report):

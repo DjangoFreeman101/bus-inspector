@@ -157,6 +157,21 @@ def get_stations(
         })
     return result
 
+@app.get("/my-votes")
+def get_my_votes(user_id: str):
+    conn = get_db()
+    cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    now = time.time()
+    cutoff = now - WINDOW_SECONDS
+    cur.execute(
+        "SELECT station_id, has_inspector FROM reports WHERE user_id = %s AND reported_at >= %s",
+        (user_id, cutoff)
+    )
+    rows = cur.fetchall()
+    cur.close()
+    conn.close()
+    return {str(row["station_id"]): "yes" if row["has_inspector"] else "no" for row in rows}
+
 @app.delete("/report")
 def delete_report(station_id: int, user_id: str):
     conn = get_db()

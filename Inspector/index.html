@@ -1095,13 +1095,9 @@
   }
 
   async function cancelReport(stationId) {
-    const url = `${API_BASE}/report?station_id=${stationId}&user_id=${encodeURIComponent(userId)}`;
-    alert('DELETE URL: ' + url);
-    const res = await fetch(url, {
+    await fetch(`${API_BASE}/report?station_id=${stationId}&user_id=${encodeURIComponent(userId)}`, {
       method: 'DELETE'
     });
-    const data = await res.json();
-    alert('Response: ' + JSON.stringify(data));
     map.closePopup();
     showToast('✅ הדיווח בוטל');
     reportFeedback();

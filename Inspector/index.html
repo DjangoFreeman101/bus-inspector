@@ -764,17 +764,41 @@
     const isNative = window.Capacitor && window.Capacitor.isNativePlatform();
 
     if (isNative && window.LocalNotifications) {
-      // Native Android — use Capacitor local notifications
       try {
         await window.LocalNotifications.requestPermissions();
+
+        // Register action types (yes/no buttons on notification)
+        await window.LocalNotifications.registerActionTypes({
+          types: [{
+            id: 'INSPECTOR_REPORT',
+            actions: [
+              { id: 'YES_INSPECTOR', title: '🚨 יש פקח' },
+              { id: 'NO_INSPECTOR', title: '✅ נקי' }
+            ]
+          }]
+        });
+
         await window.LocalNotifications.schedule({
           notifications: [{
-            title: 'דווח על פקח 🚌',
+            title: 'פקח אלרט 🚌',
             body: `נראה שאתה ב${station.name}. יש פקח?`,
             id: station.id,
+            actionTypeId: 'INSPECTOR_REPORT',
             extra: { stationId: station.id }
           }]
         });
+
+        // Listen for action button taps
+        window.LocalNotifications.addListener('localNotificationActionPerformed', async (action) => {
+          const sid = action.notification.extra && action.notification.extra.stationId;
+          if (!sid) return;
+          if (action.actionId === 'YES_INSPECTOR') {
+            await submitReport(sid, true);
+          } else if (action.actionId === 'NO_INSPECTOR') {
+            await submitReport(sid, false);
+          }
+        });
+
       } catch(e) {
         console.log('Local notification error:', e);
       }
@@ -1592,7 +1616,11 @@
     }
     document.getElementById('terms-card').innerHTML = `
       <h2 style="color:#e74c3c; text-align:center;">לא ניתן להמשיך</h2>
-      <p style="text-align:center;">יש לאשר את תנאי השימוש כדי להשתמש באפליקציה.</p>
+      <p style="text-align:center; margin-bottom:20px;">יש לאשר את תנאי השימוש כדי להשתמש באפליקציה.</p>
+      <button onclick="location.reload()" style="
+        width:100%; background:#1a1a2e; color:white; border:none;
+        padding:12px; border-radius:8px; font-size:15px; cursor:pointer;
+      ">חזרה לתנאי השימוש</button>
     `;
   }
 

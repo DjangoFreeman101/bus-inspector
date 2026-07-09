@@ -1014,49 +1014,7 @@
       showToast('✅ הדיווח בוטל');
       reportFeedback();
       await syncMyVotes();
-      // Terms of use - show on first launch
-  const TERMS_VERSION = '2';
-
-  function acceptTerms() {
-    localStorage.setItem('terms_accepted', TERMS_VERSION);
-    document.getElementById('terms-overlay').style.display = 'none';
-    // Only start loading data AFTER terms accepted
-    startApp();
-  }
-
-  function declineTerms() {
-    // Close the app
-    if (window.Capacitor && window.Capacitor.isNativePlatform()) {
-      navigator.app && navigator.app.exitApp ? navigator.app.exitApp() : window.close();
-    } else {
-      window.close();
-    }
-    // Fallback message if window.close() doesn't work
-    document.getElementById('terms-card').innerHTML = `
-      <h2 style="color:#e74c3c; text-align:center;">לא ניתן להמשיך</h2>
-      <p style="text-align:center;">יש לאשר את תנאי השימוש כדי להשתמש באפליקציה.</p>
-    `;
-  }
-
-  function startApp() {
-    setupServiceWorker();
-    requestAllPermissions();
-    startLocationTracking();
-    syncMyVotes();
-    loadStations();
-    setInterval(loadStations, 15000);
-  }
-
-  // Check terms FIRST, before any data loading
-  const termsAccepted = localStorage.getItem('terms_accepted');
-  if (termsAccepted !== TERMS_VERSION) {
-    // Show terms - hide loading screen until accepted
-    document.getElementById('loading').style.display = 'none';
-    document.getElementById('terms-overlay').style.display = 'flex';
-  } else {
-    // Already accepted - start normally
-    startApp();
-  }
+      loadStations();
       return;
     }
 
@@ -1617,7 +1575,44 @@
     }
   }
 
-  // App initialization handled by startApp() above
+  // --- Terms of use and app initialization ---
+  const TERMS_VERSION = '2';
+
+  function acceptTerms() {
+    localStorage.setItem('terms_accepted', TERMS_VERSION);
+    document.getElementById('terms-overlay').style.display = 'none';
+    startApp();
+  }
+
+  function declineTerms() {
+    if (window.Capacitor && window.Capacitor.isNativePlatform()) {
+      navigator.app && navigator.app.exitApp ? navigator.app.exitApp() : window.close();
+    } else {
+      window.close();
+    }
+    document.getElementById('terms-card').innerHTML = `
+      <h2 style="color:#e74c3c; text-align:center;">לא ניתן להמשיך</h2>
+      <p style="text-align:center;">יש לאשר את תנאי השימוש כדי להשתמש באפליקציה.</p>
+    `;
+  }
+
+  function startApp() {
+    setupServiceWorker();
+    requestAllPermissions();
+    startLocationTracking();
+    syncMyVotes();
+    loadStations();
+    setInterval(loadStations, 15000);
+  }
+
+  // Check terms FIRST before anything loads
+  const termsAccepted = localStorage.getItem('terms_accepted');
+  if (termsAccepted !== TERMS_VERSION) {
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('terms-overlay').style.display = 'flex';
+  } else {
+    startApp();
+  }
 
   // When user returns to the app, immediately check proximity
   // This handles the case where the browser throttled the interval while minimized

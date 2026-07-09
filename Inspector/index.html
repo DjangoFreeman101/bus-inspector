@@ -203,17 +203,108 @@
 
     #loading {
       position: fixed;
-      top: 60px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(26,26,46,0.85);
-      color: white;
-      padding: 8px 20px;
-      border-radius: 20px;
-      font-size: 13px;
-      z-index: 9999;
-      pointer-events: none;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: #1a1a2e;
+      z-index: 99998;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
       direction: rtl;
+    }
+
+    #loading-logo {
+      font-family: 'Heebo', sans-serif;
+      font-weight: 900;
+      font-size: 42px;
+      color: white;
+      margin-bottom: 8px;
+      letter-spacing: -1px;
+    }
+
+    #loading-sub {
+      font-size: 15px;
+      color: #e74c3c;
+      margin-bottom: 40px;
+      font-family: 'Heebo', sans-serif;
+    }
+
+    #loading-spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid rgba(255,255,255,0.2);
+      border-top-color: #e74c3c;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    #terms-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.85);
+      z-index: 99999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      direction: rtl;
+    }
+
+    #terms-card {
+      background: white;
+      border-radius: 16px;
+      padding: 28px 22px;
+      max-width: 340px;
+      width: 92%;
+      max-height: 80vh;
+      overflow-y: auto;
+      direction: rtl;
+    }
+
+    #terms-card h2 {
+      color: #1a1a2e;
+      font-size: 18px;
+      margin-bottom: 14px;
+      text-align: center;
+    }
+
+    #terms-card p {
+      font-size: 13px;
+      color: #444;
+      line-height: 1.7;
+      margin-bottom: 10px;
+    }
+
+    #terms-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    #terms-accept {
+      flex: 1;
+      background: #1a1a2e;
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    #terms-decline {
+      flex: 1;
+      background: #eee;
+      color: #555;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 15px;
+      cursor: pointer;
     }
 
     #toast {
@@ -405,6 +496,22 @@
 </div>
 <div id="map"></div>
 
+<div id="terms-overlay" style="display:none;">
+  <div id="terms-card">
+    <h2>תנאי שימוש — פקח אלרט</h2>
+    <p>ברוך הבא לפקח אלרט! לפני שתתחיל להשתמש באפליקציה, נא לקרוא את תנאי השימוש הבאים:</p>
+    <p><strong>1. מטרת האפליקציה</strong><br>פקח אלרט היא אפליקציה ציבורית המיועדת לסיוע לנוסעים בתחבורה ציבורית. האפליקציה מאפשרת דיווח על נוכחות פקחים בתחנות אוטובוס.</p>
+    <p><strong>2. אחריות הדיווח</strong><br>המשתמש מתחייב לדווח מידע אמין ואמיתי בלבד. דיווח כוזב עלול להטעות משתמשים אחרים.</p>
+    <p><strong>3. שימוש חוקי בלבד</strong><br>האפליקציה אינה מעודדת ואינה מסייעת להתחמקות מתשלום נסיעה בתחבורה ציבורית. השימוש באפליקציה אינו מהווה עידוד לאי-תשלום או לכל התנהגות בלתי חוקית אחרת. כל משתמש אחראי לפעול בהתאם לחוק.</p>
+    <p><strong>4. פרטיות</strong><br>האפליקציה אוספת מיקום ומזהה אנונימי בלבד. אין איסוף של מידע אישי מזהה. ראה מדיניות פרטיות מלאה בתפריט האפליקציה.</p>
+    <p><strong>5. אחריות</strong><br>המידע באפליקציה מבוסס על דיווחי ציבור ואינו מובטח כמדויק. המפתח אינו אחראי לנזק כלשהו הנובע משימוש באפליקציה.</p>
+    <div id="terms-buttons">
+      <button id="terms-decline" onclick="declineTerms()">דחה</button>
+      <button id="terms-accept" onclick="acceptTerms()">אני מסכים</button>
+    </div>
+  </div>
+</div>
+
 <div id="menu-overlay" onclick="closeMenu()"></div>
 <div id="side-menu">
   <div id="menu-header">🚌 תפריט</div>
@@ -473,7 +580,11 @@
   <div id="goto-results"></div>
 </div>
 <div id="toast"></div>
-<div id="loading">⏳ טוען נתונים...</div>
+<div id="loading">
+  <div id="loading-logo">פקח אלרט</div>
+  <div id="loading-sub">דווח. הזהר. סע בשקט.</div>
+  <div id="loading-spinner"></div>
+</div>
 
 <div id="manual-overlay" onclick="closeManualPanel()"></div>
 <div id="manual-panel">
@@ -511,11 +622,28 @@
 </script>
 <script>
   // Generate or retrieve persistent user ID
+  // Get persistent device ID (survives reinstalls on Android)
   let userId = localStorage.getItem('bus_inspector_uid');
   if (!userId) {
     userId = 'user_' + Math.random().toString(36).substr(2, 12);
     localStorage.setItem('bus_inspector_uid', userId);
   }
+
+  // Override with device ID if on native Android (async, non-blocking)
+  async function initDeviceId() {
+    if (window.Capacitor && window.Capacitor.isNativePlatform() && window.Capacitor.Plugins && window.Capacitor.Plugins.Device) {
+      try {
+        const info = await window.Capacitor.Plugins.Device.getId();
+        if (info && info.identifier) {
+          userId = 'device_' + info.identifier;
+          localStorage.setItem('bus_inspector_uid', userId);
+        }
+      } catch(e) {
+        console.log('Device ID failed, using random ID:', e);
+      }
+    }
+  }
+  initDeviceId(); // fire and forget - doesn't block anything
 
   // Detect if running as native app or in browser
   const proto = window.location.protocol;
@@ -715,7 +843,7 @@
     const alertCandidates = candidates.filter(s =>
       s.has_inspector === true &&
       haversine(userLat, userLon, s.lat, s.lon) <= ALERT_METERS &&
-      myVotes[s.id] !== 'yes'  // don't alert if user reported this inspector themselves
+      myVotes[String(s.id)] !== 'yes'  // don't alert if user reported this inspector themselves
     );
 
     for (const s of alertCandidates) {
@@ -839,11 +967,34 @@
       showToast('✅ הדיווח בוטל');
       reportFeedback();
       await syncMyVotes();
-      loadStations();
+      // Terms of use - show on first launch
+  function showTermsIfNeeded() {
+    const accepted = localStorage.getItem('terms_accepted');
+    if (!accepted) {
+      document.getElementById('terms-overlay').style.display = 'flex';
+    }
+  }
+
+  function acceptTerms() {
+    localStorage.setItem('terms_accepted', '1');
+    document.getElementById('terms-overlay').style.display = 'none';
+  }
+
+  function declineTerms() {
+    // Close the app or show message
+    document.getElementById('terms-card').innerHTML = `
+      <h2 style="color:#e74c3c;">לא ניתן להמשיך</h2>
+      <p>עליך לאשר את תנאי השימוש כדי להשתמש באפליקציה.</p>
+    `;
+  }
+
+  showTermsIfNeeded();
+
+  loadStations();
       return;
     }
 
-    myVotes[stationId] = newVote;
+    myVotes[String(stationId)] = newVote;
     localStorage.setItem('myVotes', JSON.stringify(myVotes));
 
     await fetch(`${API_BASE}/report`, {

@@ -499,15 +499,28 @@
 <div id="terms-overlay" style="display:none;">
   <div id="terms-card">
     <h2>תנאי שימוש — פקח אלרט</h2>
-    <p>ברוך הבא לפקח אלרט! לפני שתתחיל להשתמש באפליקציה, נא לקרוא את תנאי השימוש הבאים:</p>
-    <p><strong>1. מטרת האפליקציה</strong><br>פקח אלרט היא אפליקציה ציבורית המיועדת לסיוע לנוסעים בתחבורה ציבורית. האפליקציה מאפשרת דיווח על נוכחות פקחים בתחנות אוטובוס.</p>
-    <p><strong>2. אחריות הדיווח</strong><br>המשתמש מתחייב לדווח מידע אמין ואמיתי בלבד. דיווח כוזב עלול להטעות משתמשים אחרים.</p>
-    <p><strong>3. שימוש חוקי בלבד</strong><br>האפליקציה אינה מעודדת ואינה מסייעת להתחמקות מתשלום נסיעה בתחבורה ציבורית. השימוש באפליקציה אינו מהווה עידוד לאי-תשלום או לכל התנהגות בלתי חוקית אחרת. כל משתמש אחראי לפעול בהתאם לחוק.</p>
-    <p><strong>4. פרטיות</strong><br>האפליקציה אוספת מיקום ומזהה אנונימי בלבד. אין איסוף של מידע אישי מזהה. ראה מדיניות פרטיות מלאה בתפריט האפליקציה.</p>
-    <p><strong>5. אחריות</strong><br>המידע באפליקציה מבוסס על דיווחי ציבור ואינו מובטח כמדויק. המפתח אינו אחראי לנזק כלשהו הנובע משימוש באפליקציה.</p>
+    <p>ברוך הבא לפקח אלרט! לפני שתתחיל להשתמש באפליקציה, נא לקרוא את תנאי השימוש הבאים ולאשר אותם:</p>
+
+    <p><strong>1. מטרת האפליקציה</strong><br>
+    פקח אלרט היא אפליקציה ציבורית ומתנדבת שמטרתה לאפשר לנוסעים בתחבורה ציבורית לשתף מידע על נוכחות פקחים בתחנות אוטובוס. האפליקציה מיועדת לשימוש חוקי בלבד.</p>
+
+    <p><strong>2. הצהרה משפטית — אי-עידוד להתחמקות מתשלום</strong><br>
+    <strong style="color:#C0392B;">האפליקציה אינה מעודדת, אינה תומכת ואינה מסייעת בשום צורה להתחמקות מתשלום נסיעה בתחבורה ציבורית.</strong> אי-תשלום נסיעה מהווה עבירה על החוק בישראל. המפתח מתנגד לכל שימוש באפליקציה לצורך התחמקות מתשלום, ומסיר מעצמו כל אחריות משפטית, אזרחית או פלילית הנובעת משימוש שכזה. המשתמש נושא באחריות הבלעדית לפעולותיו.</p>
+
+    <p><strong>3. אחריות הדיווח</strong><br>
+    המשתמש מתחייב לדווח מידע אמין, אמיתי ומבוסס על מה שראה בפועל. דיווח כוזב או מטעה עלול להזיק למשתמשים אחרים ומהווה שימוש לרעה באפליקציה.</p>
+
+    <p><strong>4. הגבלת אחריות</strong><br>
+    המידע באפליקציה מבוסס אך ורק על דיווחי ציבור ואינו מובטח כמדויק, עדכני או שלם. המפתח אינו אחראי לכל נזק, הפסד, קנס או תוצאה שלילית אחרת הנובעים משימוש במידע המוצג באפליקציה.</p>
+
+    <p><strong>5. פרטיות</strong><br>
+    האפליקציה אוספת מיקום גאוגרפי ומזהה מכשיר אנונימי בלבד, לצורך פעולת האפליקציה. אין איסוף של שם, מספר טלפון, כתובת אימייל או כל מידע מזהה אחר.</p>
+
+    <p style="font-size:11px; color:#888; margin-top:14px;">על ידי לחיצה על "אני מסכים" אתה מאשר שקראת והבנת את תנאי השימוש לעיל ומתחייב לפעול בהתאם לחוק.</p>
+
     <div id="terms-buttons">
       <button id="terms-decline" onclick="declineTerms()">דחה</button>
-      <button id="terms-accept" onclick="acceptTerms()">אני מסכים</button>
+      <button id="terms-accept" onclick="acceptTerms()">אני מסכים ✓</button>
     </div>
   </div>
 </div>
@@ -518,6 +531,7 @@
   <div class="menu-item" onclick="openAbout()">ℹ️ אודות</div>
   <div class="menu-item" onclick="window.location.href='mailto:ybg1998@gmail.com'">✉️ צרו קשר</div>
   <div class="menu-item" onclick="openPrivacy()">🔒 מדיניות פרטיות</div>
+  <div class="menu-item" onclick="closeMenu(); document.getElementById('terms-overlay').style.display='flex'">📋 תנאי שימוש</div>
 </div>
 
 <div id="about-panel">
@@ -584,6 +598,9 @@
   <div id="loading-logo">פקח אלרט</div>
   <div id="loading-sub">דווח. הזהר. סע בשקט.</div>
   <div id="loading-spinner"></div>
+  <div style="position:absolute; bottom:30px; left:20px; right:20px; text-align:center; font-size:11px; color:rgba(255,255,255,0.4); direction:rtl; line-height:1.6;">
+    פקח אלרט אינה מעודדת בשום אופן התנהגות העוברת על החוק, לרבות אי תיקוף נסיעה באוטובוס
+  </div>
 </div>
 
 <div id="manual-overlay" onclick="closeManualPanel()"></div>
@@ -968,15 +985,17 @@
       reportFeedback();
       await syncMyVotes();
       // Terms of use - show on first launch
+  const TERMS_VERSION = '2'; // increment this to force re-acceptance after terms update
+
   function showTermsIfNeeded() {
     const accepted = localStorage.getItem('terms_accepted');
-    if (!accepted) {
+    if (accepted !== TERMS_VERSION) {
       document.getElementById('terms-overlay').style.display = 'flex';
     }
   }
 
   function acceptTerms() {
-    localStorage.setItem('terms_accepted', '1');
+    localStorage.setItem('terms_accepted', TERMS_VERSION);
     document.getElementById('terms-overlay').style.display = 'none';
   }
 

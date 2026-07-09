@@ -531,7 +531,7 @@
   <div class="menu-item" onclick="openAbout()">ℹ️ אודות</div>
   <div class="menu-item" onclick="window.location.href='mailto:ybg1998@gmail.com'">✉️ צרו קשר</div>
   <div class="menu-item" onclick="openPrivacy()">🔒 מדיניות פרטיות</div>
-  <div class="menu-item" onclick="closeMenu(); document.getElementById('terms-overlay').style.display='flex'">📋 תנאי שימוש</div>
+  <div class="menu-item" onclick="openTermsReadOnly()">📋 תנאי שימוש</div>
 </div>
 
 <div id="about-panel">
@@ -575,6 +575,38 @@
 
   <h3 style="color:#1a1a2e; margin-bottom:8px;">7. יצירת קשר</h3>
   <p style="font-size:14px; line-height:1.8; color:#333; margin-bottom:20px;">לשאלות בנושא פרטיות: <a href="mailto:ybg1998@gmail.com">ybg1998@gmail.com</a></p>
+
+  <p style="color:#aaa; font-size:12px;">&copy; כל הזכויות שמורות יוגב ברגיל, 2026</p>
+</div>
+
+<div id="terms-readonly-panel" style="
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: white; z-index: 4000; direction: rtl;
+  padding: 24px 20px; display: none; flex-direction: column;
+  overflow-y: auto;
+">
+  <button onclick="document.getElementById('terms-readonly-panel').style.display='none'" style="
+    background: none; border: none; font-size: 15px;
+    color: #1a1a2e; cursor: pointer; margin-bottom: 20px; text-align: right;
+  ">→ חזרה</button>
+  <h2 style="margin-bottom:6px; color:#1a1a2e;">תנאי שימוש — פקח אלרט</h2>
+
+  <p style="font-size:14px; line-height:1.8; color:#333; margin-bottom:14px;">ברוך הבא לפקח אלרט! האפליקציה מיועדת לשימוש חוקי בלבד.</p>
+
+  <h3 style="color:#1a1a2e; margin-bottom:8px;">1. מטרת האפליקציה</h3>
+  <p style="font-size:14px; line-height:1.8; color:#333; margin-bottom:14px;">פקח אלרט היא אפליקציה ציבורית ומתנדבת שמטרתה לאפשר לנוסעים בתחבורה ציבורית לשתף מידע על נוכחות פקחים בתחנות אוטובוס.</p>
+
+  <h3 style="color:#1a1a2e; margin-bottom:8px;">2. הצהרה משפטית</h3>
+  <p style="font-size:14px; line-height:1.8; color:#333; margin-bottom:14px;"><strong style="color:#C0392B;">האפליקציה אינה מעודדת, אינה תומכת ואינה מסייעת בשום צורה להתחמקות מתשלום נסיעה בתחבורה ציבורית.</strong> אי-תשלום נסיעה מהווה עבירה על החוק בישראל. המפתח מסיר מעצמו כל אחריות משפטית, אזרחית או פלילית הנובעת משימוש שכזה. המשתמש נושא באחריות הבלעדית לפעולותיו.</p>
+
+  <h3 style="color:#1a1a2e; margin-bottom:8px;">3. אחריות הדיווח</h3>
+  <p style="font-size:14px; line-height:1.8; color:#333; margin-bottom:14px;">המשתמש מתחייב לדווח מידע אמין ואמיתי בלבד. דיווח כוזב עלול להזיק למשתמשים אחרים.</p>
+
+  <h3 style="color:#1a1a2e; margin-bottom:8px;">4. הגבלת אחריות</h3>
+  <p style="font-size:14px; line-height:1.8; color:#333; margin-bottom:14px;">המידע באפליקציה מבוסס על דיווחי ציבור ואינו מובטח כמדויק. המפתח אינו אחראי לכל נזק הנובע משימוש באפליקציה.</p>
+
+  <h3 style="color:#1a1a2e; margin-bottom:8px;">5. פרטיות</h3>
+  <p style="font-size:14px; line-height:1.8; color:#333; margin-bottom:20px;">האפליקציה אוספת מיקום גאוגרפי ומזהה מכשיר אנונימי בלבד. אין איסוף של מידע אישי מזהה.</p>
 
   <p style="color:#aaa; font-size:12px;">&copy; כל הזכויות שמורות יוגב ברגיל, 2026</p>
 </div>
@@ -985,31 +1017,45 @@
       reportFeedback();
       await syncMyVotes();
       // Terms of use - show on first launch
-  const TERMS_VERSION = '2'; // increment this to force re-acceptance after terms update
-
-  function showTermsIfNeeded() {
-    const accepted = localStorage.getItem('terms_accepted');
-    if (accepted !== TERMS_VERSION) {
-      document.getElementById('terms-overlay').style.display = 'flex';
-    }
-  }
+  const TERMS_VERSION = '2';
 
   function acceptTerms() {
     localStorage.setItem('terms_accepted', TERMS_VERSION);
     document.getElementById('terms-overlay').style.display = 'none';
+    // Only start loading data AFTER terms accepted
+    startApp();
   }
 
   function declineTerms() {
-    // Close the app or show message
+    // Close the app
+    if (window.Capacitor && window.Capacitor.isNativePlatform()) {
+      navigator.app && navigator.app.exitApp ? navigator.app.exitApp() : window.close();
+    } else {
+      window.close();
+    }
+    // Fallback message if window.close() doesn't work
     document.getElementById('terms-card').innerHTML = `
-      <h2 style="color:#e74c3c;">לא ניתן להמשיך</h2>
-      <p>עליך לאשר את תנאי השימוש כדי להשתמש באפליקציה.</p>
+      <h2 style="color:#e74c3c; text-align:center;">לא ניתן להמשיך</h2>
+      <p style="text-align:center;">יש לאשר את תנאי השימוש כדי להשתמש באפליקציה.</p>
     `;
   }
 
-  showTermsIfNeeded();
+  function startApp() {
+    syncMyVotes();
+    loadStations();
+    setInterval(loadStations, 15000);
+  }
 
-  loadStations();
+  // Check terms FIRST, before any data loading
+  const termsAccepted = localStorage.getItem('terms_accepted');
+  if (termsAccepted !== TERMS_VERSION) {
+    // Show terms - hide loading screen until accepted
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('terms-overlay').style.display = 'flex';
+  } else {
+    // Already accepted - start normally
+    startApp();
+  }
       return;
     }
 
@@ -1443,6 +1489,11 @@
     document.getElementById('privacy-panel').style.display = 'none';
   }
 
+  function openTermsReadOnly() {
+    closeMenu();
+    document.getElementById('terms-readonly-panel').style.display = 'flex';
+  }
+
   function openAbout() {
     closeMenu();
     document.getElementById('about-panel').classList.add('open');
@@ -1566,9 +1617,7 @@
     }
   }
 
-  syncMyVotes();
-  loadStations();
-  setInterval(loadStations, 15000); // refresh every 15 seconds
+  // App initialization handled by startApp() above
 
   // When user returns to the app, immediately check proximity
   // This handles the case where the browser throttled the interval while minimized
